@@ -1,5 +1,5 @@
 // Personal Assistant Progressive Web App - Service Worker
-const CACHE_NAME = 'personal-assistant-v1.5.0';
+const CACHE_NAME = 'personal-assistant-v1.6.0';
 
 const PRECACHE_ASSETS = [
   './',
