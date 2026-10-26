@@ -158,6 +158,10 @@ class BudgetApp {
     } else if (status === 'synced') {
       badge.textContent = '☁️ Synced';
       badge.className = 'sync-status synced';
+    } else if (status === 'quota_exceeded') {
+      badge.textContent = '⚠️ Drive Full';
+      badge.className = 'sync-status error';
+      this.showToast('Your Google Drive is out of storage. Budget is safely stored on this device.', 'error');
     } else if (status === 'error') {
       badge.textContent = '⚠️ Offline';
       badge.className = 'sync-status error';

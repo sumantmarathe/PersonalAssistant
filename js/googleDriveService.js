@@ -5,8 +5,8 @@
  */
 class GoogleDriveService {
   constructor() {
-    // Default Web Client ID pre-configured for the application
-    this.clientId = '408226849318-pa-budget-planner.apps.googleusercontent.com';
+    // Registered Google OAuth 2.0 Web Client ID
+    this.clientId = '346635727868-js7g17t1nklilet2c28b4i54o5is2eil.apps.googleusercontent.com';
     this.fileName = 'personal_assistant_budget_backup.json';
     this.scope = 'https://www.googleapis.com/auth/drive.file';
 
@@ -156,7 +156,13 @@ class GoogleDriveService {
           },
           body: contentString
         });
-        if (!res.ok) throw new Error('Sync update failed');
+        if (!res.ok) {
+          if (res.status === 403) {
+            this._notifySync('quota_exceeded');
+            return;
+          }
+          throw new Error('Sync update failed');
+        }
       } else {
         const metadata = { name: this.fileName, mimeType: 'application/json' };
         const boundary = '-------pa_boundary_' + Date.now();
@@ -181,7 +187,13 @@ class GoogleDriveService {
           },
           body: multipartBody
         });
-        if (!res.ok) throw new Error('Sync creation failed');
+        if (!res.ok) {
+          if (res.status === 403) {
+            this._notifySync('quota_exceeded');
+            return;
+          }
+          throw new Error('Sync creation failed');
+        }
       }
 
       this._notifySync('synced');
