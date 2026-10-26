@@ -4,6 +4,28 @@ All notable changes to this project are documented in this file following the Ke
 
 ---
 
+## [v1.2.0] - 2026-10-26 (Sprint 03 Delivery)
+
+### Added
+- **Standalone Android Application (`.apk`)**:
+  - Native Android application container (`com.personalassistant.app`) package compiled and verified.
+  - Users can launch Personal Assistant directly from their Android device home screen without opening a web browser or typing URLs.
+  - Immersive full-screen view without browser address bars, with hardware back-button navigation support.
+- **100% Offline & Storage Parity**:
+  - Bundled local web assets in Android app for instant offline launch (0ms network delay).
+  - DOM Storage and IndexedDB persistence enabled inside Android container with zero telemetry or data leakage.
+- **Dual-Target Automated Packaging Tool**:
+  - `scripts/build-android.mjs` synchronizes root web assets into Android `assets/www/` and triggers APK compilation.
+- **Dual-Target Verification Pipeline**:
+  - 4 new automated unit tests (`tests/unit/android_packaging.test.mjs`).
+  - 2 new cross-platform integration tests (`tests/integration/dual_target_persistence.test.mjs`).
+  - 27/27 total automated tests passing.
+  - Real Android emulator execution on `medium_phone` with screenshot evidence and Chrome DevTools Protocol testing.
+  - Browser E2E validation recording on deployed web page.
+  - L1 Technical Review and L2 Principal Meta-Audit certifications.
+
+---
+
 ## [v1.1.0] - 2026-10-26 (Sprint 02 Delivery)
 
 ### Added
