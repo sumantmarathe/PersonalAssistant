@@ -102,3 +102,30 @@ test('StatementParser: Duplicate Transaction Detection', () => {
   assert.equal(evaluated[1].isDuplicate, false, 'Second entry must be unique');
   assert.equal(evaluated[1].selected, true, 'Unique entry must be selected by default');
 });
+
+test('StatementParser: Account Number & IFSC Code Metadata Extraction', () => {
+  const sbiText = `
+    STATE BANK OF INDIA
+    Account Name: MR JOHN DOE
+    Account No: 12345678901
+    IFS Code: SBIN0001234
+    Branch: KORAMANGALA BANGALORE
+  `;
+  const metaSBI = parser.extractAccountMetadata(sbiText);
+  assert.ok(metaSBI, 'Metadata should be detected for SBI statement');
+  assert.equal(metaSBI.accountNumber, '12345678901');
+  assert.equal(metaSBI.ifscCode, 'SBIN0001234');
+  assert.equal(metaSBI.detectedBank, 'State Bank of India');
+
+  const axisText = `
+    AXIS BANK LTD
+    A/C Number: 918020012345678
+    IFSC: UTIB0000045
+  `;
+  const metaAxis = parser.extractAccountMetadata(axisText);
+  assert.ok(metaAxis, 'Metadata should be detected for Axis statement');
+  assert.equal(metaAxis.accountNumber, '918020012345678');
+  assert.equal(metaAxis.ifscCode, 'UTIB0000045');
+  assert.equal(metaAxis.detectedBank, 'Axis Bank');
+});
+

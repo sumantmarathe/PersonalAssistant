@@ -83,115 +83,257 @@
       </div>
     </div>
 
-    <!-- Financial Metric Summary Cards -->
-    <section class="metrics-grid" aria-label="Financial Summary Cards">
-      <div class="metric-card balance">
-        <div class="metric-header">
-          <span class="metric-label">Net Balance</span>
-          <div class="metric-icon">💳</div>
-        </div>
-        <div class="metric-value" id="metric-net-balance">₹0.00</div>
-      </div>
-
-      <div class="metric-card income">
-        <div class="metric-header">
-          <span class="metric-label">Total Income</span>
-          <div class="metric-icon">📈</div>
-        </div>
-        <div class="metric-value" id="metric-total-income">₹0.00</div>
-      </div>
-
-      <div class="metric-card expense">
-        <div class="metric-header">
-          <span class="metric-label">Total Expenses</span>
-          <div class="metric-icon">📉</div>
-        </div>
-        <div class="metric-value" id="metric-total-expense">₹0.00</div>
-      </div>
-    </section>
-
-    <!-- Sub-App Content Grid: Form + Ledger -->
-    <div class="app-content-grid">
-
-      <!-- Left Column: Transaction Input Form -->
-      <aside class="panel">
-        <h2 class="panel-title"><span>✍️</span> Record Transaction</h2>
-
-        <!-- Type Selector: Expense vs Income -->
-        <div class="type-toggle-group">
-          <button type="button" class="type-toggle-btn active expense" data-type="expense">
-            <span>📉</span> Expense
-          </button>
-          <button type="button" class="type-toggle-btn income" data-type="income">
-            <span>📈</span> Income
-          </button>
-        </div>
-
-        <form id="transaction-form" autocomplete="off">
-          <div class="form-group">
-            <label class="form-label" for="tx-amount">Amount (₹)</label>
-            <input type="number" step="0.01" min="0.01" id="tx-amount" class="input-control" placeholder="0.00" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="tx-category">Category</label>
-            <select id="tx-category" class="input-control" required></select>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="tx-date">Date</label>
-            <input type="date" id="tx-date" class="input-control" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="tx-description">Note / Description (Optional)</label>
-            <input type="text" id="tx-description" class="input-control" placeholder="e.g. Trader Joe's groceries, salary bonus">
-          </div>
-
-          <button type="submit" id="btn-submit-tx" class="btn-submit">
-            <span>+ Add Expense</span>
-          </button>
-        </form>
-
-        <button id="btn-import-statement" class="btn-import-statement" title="Import transactions from a bank statement PDF or CSV">
-          <span>📄</span> Import Bank Statement (PDF / CSV)
+    <!-- Tab Navigation & Global Account Filter Toolbar -->
+    <div class="navigation-toolbar">
+      <nav class="app-tab-navigation" role="tablist" aria-label="Main Navigation">
+        <button class="app-tab-btn active" id="tab-btn-ledger" role="tab" aria-selected="true" data-tab="tab-ledger">
+          <span>📜</span> Ledger & Entry
         </button>
+        <button class="app-tab-btn" id="tab-btn-stats" role="tab" aria-selected="false" data-tab="tab-stats">
+          <span>📊</span> Analytics & Stats
+        </button>
+        <button class="app-tab-btn" id="tab-btn-accounts" role="tab" aria-selected="false" data-tab="tab-accounts">
+          <span>🏦</span> Accounts (<span id="tab-account-count">0</span>)
+        </button>
+      </nav>
 
-        <!-- Secondary Local File Options -->
-        <div class="local-backup-footer">
-          <input type="file" id="import-file-input" accept=".json,application/json" style="display: none;">
-          <button id="btn-import-trigger" class="btn-text-subtle" title="Restore from local file">
-            📁 Restore file
-          </button>
-          <span>•</span>
-          <button id="btn-export-backup" class="btn-text-subtle" title="Save backup file">
-            💾 Save file
-          </button>
-        </div>
-      </aside>
+      <div class="account-selector-wrapper">
+        <label for="global-account-filter" class="account-selector-label">Active Account:</label>
+        <select id="global-account-filter" class="input-control select-account-pill">
+          <option value="all">🏦 All Accounts</option>
+        </select>
+      </div>
+    </div>
 
-      <!-- Right Column: Ledger & Search Filters -->
-      <section class="panel">
-        <div class="ledger-header">
-          <h2 class="panel-title" style="margin-bottom: 0;"><span>📜</span> Transaction Ledger</h2>
-
-          <!-- Filters -->
-          <div class="filter-group">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="income">Incomes</button>
-            <button class="filter-btn" data-filter="expense">Expenses</button>
+    <!-- Tab 1: Ledger & Entry View -->
+    <div id="tab-ledger-view" class="tab-pane active">
+      <!-- Financial Metric Summary Cards -->
+      <section class="metrics-grid" aria-label="Financial Summary Cards">
+        <div class="metric-card balance">
+          <div class="metric-header">
+            <span class="metric-label">Net Balance</span>
+            <div class="metric-icon">💳</div>
           </div>
-
-          <!-- Search -->
-          <input type="text" id="search-input" class="input-control search-input" placeholder="🔍 Search records...">
+          <div class="metric-value" id="metric-net-balance">₹0.00</div>
         </div>
 
-        <!-- Scrollable List of Records -->
-        <div class="transaction-list" id="transaction-list">
-          <!-- Dynamically populated by budgetApp.js -->
+        <div class="metric-card income">
+          <div class="metric-header">
+            <span class="metric-label">Total Income</span>
+            <div class="metric-icon">📈</div>
+          </div>
+          <div class="metric-value" id="metric-total-income">₹0.00</div>
+        </div>
+
+        <div class="metric-card expense">
+          <div class="metric-header">
+            <span class="metric-label">Total Expenses</span>
+            <div class="metric-icon">📉</div>
+          </div>
+          <div class="metric-value" id="metric-total-expense">₹0.00</div>
         </div>
       </section>
 
+      <!-- Sub-App Content Grid: Form + Ledger -->
+      <div class="app-content-grid">
+
+        <!-- Left Column: Transaction Input Form -->
+        <aside class="panel">
+          <h2 class="panel-title"><span>✍️</span> Record Transaction</h2>
+
+          <!-- Type Selector: Expense vs Income -->
+          <div class="type-toggle-group">
+            <button type="button" class="type-toggle-btn active expense" data-type="expense">
+              <span>📉</span> Expense
+            </button>
+            <button type="button" class="type-toggle-btn income" data-type="income">
+              <span>📈</span> Income
+            </button>
+          </div>
+
+          <form id="transaction-form" autocomplete="off">
+            <div class="form-group">
+              <label class="form-label" for="tx-amount">Amount (₹)</label>
+              <input type="number" step="0.01" min="0.01" id="tx-amount" class="input-control" placeholder="0.00" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="tx-account">Bank Account</label>
+              <select id="tx-account" class="input-control">
+                <option value="">Default / Cash</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="tx-category">Category</label>
+              <select id="tx-category" class="input-control" required></select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="tx-date">Date</label>
+              <input type="date" id="tx-date" class="input-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="tx-description">Note / Description (Optional)</label>
+              <input type="text" id="tx-description" class="input-control" placeholder="e.g. Trader Joe's groceries, salary bonus">
+            </div>
+
+            <button type="submit" id="btn-submit-tx" class="btn-submit">
+              <span>+ Add Expense</span>
+            </button>
+          </form>
+
+          <button id="btn-import-statement" class="btn-import-statement" title="Import transactions from a bank statement PDF or CSV">
+            <span>📄</span> Import Bank Statement (PDF / CSV)
+          </button>
+
+          <!-- Secondary Local File Options -->
+          <div class="local-backup-footer">
+            <input type="file" id="import-file-input" accept=".json,application/json" style="display: none;">
+            <button id="btn-import-trigger" class="btn-text-subtle" title="Restore from local file">
+              📁 Restore file
+            </button>
+            <span>•</span>
+            <button id="btn-export-backup" class="btn-text-subtle" title="Save backup file">
+              💾 Save file
+            </button>
+          </div>
+        </aside>
+
+        <!-- Right Column: Ledger & Search Filters -->
+        <section class="panel">
+          <div class="ledger-header">
+            <h2 class="panel-title" style="margin-bottom: 0;"><span>📜</span> Transaction Ledger</h2>
+
+            <!-- Filters -->
+            <div class="filter-group">
+              <button class="filter-btn active" data-filter="all">All</button>
+              <button class="filter-btn" data-filter="income">Incomes</button>
+              <button class="filter-btn" data-filter="expense">Expenses</button>
+            </div>
+
+            <!-- Search -->
+            <input type="text" id="search-input" class="input-control search-input" placeholder="🔍 Search records...">
+          </div>
+
+          <!-- Scrollable List of Records -->
+          <div class="transaction-list" id="transaction-list">
+            <!-- Dynamically populated by budgetApp.js -->
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- Tab 2: Analytics & Stats View -->
+    <div id="tab-stats-view" class="tab-pane" style="display: none;">
+      <!-- Stats Filter Bar -->
+      <div class="stats-filter-card">
+        <div class="stats-filter-presets">
+          <span class="filter-heading">Range:</span>
+          <button class="stats-preset-btn active" data-range="all">All Time</button>
+          <button class="stats-preset-btn" data-range="this_year">This Year</button>
+          <button class="stats-preset-btn" data-range="last_year">Last Year</button>
+          <button class="stats-preset-btn" data-range="this_month">This Month</button>
+          <button class="stats-preset-btn" data-range="last_month">Last Month</button>
+          <button class="stats-preset-btn" data-range="last_30_days">Last 30 Days</button>
+          <button class="stats-preset-btn" data-range="custom">Custom Date</button>
+        </div>
+
+        <!-- Custom Date Range Picker -->
+        <div id="stats-custom-dates-picker" class="stats-custom-picker" style="display: none;">
+          <div class="custom-date-inputs">
+            <label>From: <input type="date" id="stats-date-from" class="input-control input-sm"></label>
+            <label>To: <input type="date" id="stats-date-to" class="input-control input-sm"></label>
+            <button id="btn-apply-custom-stats" class="btn-secondary btn-sm">Apply</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Key Metrics Grid -->
+      <div class="stats-metrics-grid">
+        <div class="stats-metric-card expense">
+          <div class="stat-card-label">Total Expenses</div>
+          <div class="stat-card-value" id="stat-val-expense">₹0.00</div>
+          <div class="stat-card-sub" id="stat-sub-expense">0 transactions</div>
+        </div>
+
+        <div class="stats-metric-card income">
+          <div class="stat-card-label">Total Income</div>
+          <div class="stat-card-value" id="stat-val-income">₹0.00</div>
+          <div class="stat-card-sub" id="stat-sub-income">0 transactions</div>
+        </div>
+
+        <div class="stats-metric-card balance">
+          <div class="stat-card-label">Net Savings</div>
+          <div class="stat-card-value" id="stat-val-savings">₹0.00</div>
+          <div class="stat-card-sub" id="stat-val-savings-rate">Savings Rate: 0%</div>
+        </div>
+
+        <div class="stats-metric-card average">
+          <div class="stat-card-label">Daily Average Spend</div>
+          <div class="stat-card-value" id="stat-val-daily-avg">₹0.00</div>
+          <div class="stat-card-sub" id="stat-sub-days">Over period</div>
+        </div>
+
+        <div class="stats-metric-card peak">
+          <div class="stat-card-label">Peak Spending Day</div>
+          <div class="stat-card-value" id="stat-val-peak-amount">₹0.00</div>
+          <div class="stat-card-sub" id="stat-val-peak-date">None</div>
+        </div>
+      </div>
+
+      <!-- Detailed Visuals & Breakdowns Grid -->
+      <div class="stats-content-grid">
+        <!-- Left Column: Trend Chart & Top 5 Expenses -->
+        <div class="stats-main-col">
+          <div class="panel">
+            <div class="panel-header-clean">
+              <h3 class="panel-subtitle"><span>📈</span> Spending Time-Trend</h3>
+              <span class="badge-subtle" id="stats-trend-granularity">Daily / Monthly</span>
+            </div>
+            <div class="trend-chart-wrapper" id="stats-trend-chart">
+              <!-- Dynamically populated bars -->
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top: 1.5rem;">
+            <h3 class="panel-subtitle"><span>🔝</span> Top 5 Largest Expenses</h3>
+            <div class="top-expenses-list" id="stats-top-expenses">
+              <!-- Dynamically populated items -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Category Breakdown -->
+        <div class="stats-side-col">
+          <div class="panel">
+            <h3 class="panel-subtitle"><span>🥧</span> Category Spending Breakdown</h3>
+            <div class="category-breakdown-list" id="stats-category-list">
+              <!-- Dynamically populated progress bars -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Bank Accounts Management View -->
+    <div id="tab-accounts-view" class="tab-pane" style="display: none;">
+      <div class="accounts-header-bar">
+        <div>
+          <h2 class="panel-title" style="margin-bottom: 0.25rem;"><span>🏦</span> Bank Accounts</h2>
+          <p class="panel-subtitle-text">Manage multiple bank accounts (Axis, SBI, HDFC, ICICI, etc.) with account numbers and IFSC codes.</p>
+        </div>
+        <button id="btn-open-add-account" class="btn-primary">
+          <span>+ Add Bank Account</span>
+        </button>
+      </div>
+
+      <!-- Accounts Grid -->
+      <div class="accounts-grid" id="accounts-cards-grid">
+        <!-- Dynamically populated cards -->
+      </div>
     </div>
   </main>
 
@@ -240,6 +382,16 @@
                 <option value="generic">Universal / Generic</option>
               </select>
             </div>
+
+            <!-- Target Account Mapping -->
+            <div class="statement-account-assignment">
+              <label for="stmt-account-target"><strong>Map to Account:</strong></label>
+              <select id="stmt-account-target" class="input-control select-sm">
+                <option value="">Default / General</option>
+              </select>
+              <span id="stmt-detected-account-badge" class="badge-account-detect" style="display: none;"></span>
+            </div>
+
             <div class="select-actions">
               <button id="btn-select-all-stmt" class="btn-text-subtle">Select All</button>
               <span>•</span>
@@ -252,12 +404,22 @@
             <table class="statement-table" id="statement-preview-table">
               <thead>
                 <tr>
-                  <th width="40"><input type="checkbox" id="stmt-check-master" checked></th>
-                  <th width="110">Date</th>
-                  <th>Description</th>
-                  <th width="100">Type</th>
-                  <th width="140">Category</th>
-                  <th width="120" style="text-align: right;">Amount (₹)</th>
+                  <th width="40"><input type="checkbox" id="stmt-check-master" checked title="Select or deselect all transactions"></th>
+                  <th width="115" class="sortable-th" data-sort="date" role="button" tabindex="0" title="Sort by Date">
+                    Date <span class="sort-icon">↕</span>
+                  </th>
+                  <th class="sortable-th" data-sort="description" role="button" tabindex="0" title="Sort by Description">
+                    Description <span class="sort-icon">↕</span>
+                  </th>
+                  <th width="100" class="sortable-th" data-sort="type" role="button" tabindex="0" title="Sort by Type">
+                    Type <span class="sort-icon">↕</span>
+                  </th>
+                  <th width="140" class="sortable-th" data-sort="category" role="button" tabindex="0" title="Sort by Category">
+                    Category <span class="sort-icon">↕</span>
+                  </th>
+                  <th width="130" class="sortable-th" data-sort="amount" role="button" tabindex="0" style="text-align: right;" title="Sort by Amount">
+                    Amount (₹) <span class="sort-icon">↕</span>
+                  </th>
                 </tr>
               </thead>
               <tbody id="statement-preview-tbody">
@@ -294,6 +456,85 @@
           <span>📥 Import Selected Entries</span>
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add / Edit Bank Account -->
+  <div id="modal-account-form" class="modal-backdrop" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">🏦</span>
+          <div>
+            <h3 class="modal-title" id="account-modal-title">Add Bank Account</h3>
+            <p class="modal-subtitle">Secure, on-device bank account registration</p>
+          </div>
+        </div>
+        <button id="btn-close-account-modal" class="modal-close-btn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <form id="account-form" autocomplete="off">
+        <div class="modal-body">
+          <input type="hidden" id="account-id-input">
+
+          <div class="form-group">
+            <label class="form-label" for="acc-bank-select">Bank Name *</label>
+            <select id="acc-bank-select" class="input-control" required>
+              <option value="">Select Bank</option>
+              <option value="State Bank of India">State Bank of India (SBI)</option>
+              <option value="Axis Bank">Axis Bank</option>
+              <option value="HDFC Bank">HDFC Bank</option>
+              <option value="ICICI Bank">ICICI Bank</option>
+              <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
+              <option value="Punjab National Bank">Punjab National Bank</option>
+              <option value="Bank of Baroda">Bank of Baroda</option>
+              <option value="Other">Other Bank</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="acc-custom-bank-group" style="display: none;">
+            <label class="form-label" for="acc-custom-bank">Custom Bank Name *</label>
+            <input type="text" id="acc-custom-bank" class="input-control" placeholder="Enter bank name">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="acc-number">Account Number *</label>
+            <input type="text" id="acc-number" class="input-control" placeholder="e.g. 123456789012" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="acc-ifsc">IFSC Code *</label>
+            <input type="text" id="acc-ifsc" class="input-control" placeholder="e.g. SBIN0001234 or UTIB0000045" style="text-transform: uppercase;" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="acc-type">Account Type</label>
+            <select id="acc-type" class="input-control">
+              <option value="savings">Savings Account</option>
+              <option value="current">Current Account</option>
+              <option value="credit_card">Credit Card</option>
+              <option value="wallet">Digital Wallet / Cash</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="acc-nickname">Nickname / Label (Optional)</label>
+            <input type="text" id="acc-nickname" class="input-control" placeholder="e.g. Primary Salary, Emergency Savings">
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" id="acc-default">
+              <span>Set as default account</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="btn-cancel-account" class="btn-secondary">Cancel</button>
+          <button type="submit" id="btn-save-account" class="btn-primary">Save Account</button>
+        </div>
+      </form>
     </div>
   </div>
 

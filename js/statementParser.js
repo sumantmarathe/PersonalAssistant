@@ -212,7 +212,51 @@ class StatementParser {
       });
     }
 
+    transactions.metadata = this.extractAccountMetadata(text);
     return transactions;
+  }
+
+  /**
+   * Scans text for account metadata such as Account Number, IFSC code, or Bank name
+   * @param {string} text
+   * @returns {Object|null}
+   */
+  extractAccountMetadata(text) {
+    if (!text || typeof text !== 'string') return null;
+
+    let accountNumber = null;
+    let ifscCode = null;
+    let detectedBank = null;
+
+    // Detect IFSC code (e.g. SBIN0001234, UTIB0000001, HDFC0000123, ICIC0001234)
+    const ifscMatch = text.match(/\b([A-Z]{4}0[A-Z0-9]{6})\b/i);
+    if (ifscMatch) {
+      ifscCode = ifscMatch[1].toUpperCase();
+    }
+
+    // Detect Account Number (e.g. "A/c No: 12345678901", "Account Number: ****1234", "A/C: 987654321")
+    const accMatch = text.match(/(?:a\/c|acct|account)(?:\s*no\.?|\s*number)?\s*[:#-]?\s*([xX*0-9]{4,20})/i);
+    if (accMatch) {
+      accountNumber = accMatch[1].trim();
+    }
+
+    // Detect Bank Names
+    if (/\b(sbi|state\s*bank\s*of\s*india)\b/i.test(text) || (ifscCode && ifscCode.startsWith('SBIN'))) {
+      detectedBank = 'State Bank of India';
+    } else if (/\b(axis\s*bank)\b/i.test(text) || (ifscCode && ifscCode.startsWith('UTIB'))) {
+      detectedBank = 'Axis Bank';
+    } else if (/\b(hdfc\s*bank|hdfc)\b/i.test(text) || (ifscCode && ifscCode.startsWith('HDFC'))) {
+      detectedBank = 'HDFC Bank';
+    } else if (/\b(icici\s*bank|icici)\b/i.test(text) || (ifscCode && ifscCode.startsWith('ICIC'))) {
+      detectedBank = 'ICICI Bank';
+    } else if (/\b(kotak\s*mahindra|kotak)\b/i.test(text) || (ifscCode && ifscCode.startsWith('KKBK'))) {
+      detectedBank = 'Kotak Mahindra Bank';
+    }
+
+    if (accountNumber || ifscCode || detectedBank) {
+      return { accountNumber, ifscCode, detectedBank, bankName: detectedBank };
+    }
+    return null;
   }
 
   /**
@@ -329,6 +373,15 @@ class StatementParser {
       }
     }
 
+    // Attempt to extract account metadata from the first page text items
+    let rawPdfSnippet = '';
+    try {
+      const page1 = await pdf.getPage(1);
+      const text1 = await page1.getTextContent();
+      rawPdfSnippet = (text1.items || []).map(i => i.str).join(' ');
+    } catch (_) {}
+
+    extractedRows.metadata = this.extractAccountMetadata(rawPdfSnippet);
     return extractedRows;
   }
 

@@ -17,3 +17,4 @@ android/.gradle/
 android/app/build/
 local.properties
 android/local.properties
+artifacts_screenshots/
