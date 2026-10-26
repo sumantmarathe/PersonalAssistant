@@ -11,6 +11,8 @@ class BudgetApp {
     this.searchQuery = '';
     this.activeFormType = 'expense';
     this.parsedStatementTransactions = [];
+    this.statementSortField = null;
+    this.statementSortAsc = true;
 
     this.categories = {
       expense: [
@@ -217,10 +219,29 @@ class BudgetApp {
     if (btnCommit) {
       btnCommit.addEventListener('click', () => this.commitStatementImport());
     }
+
+    // Header click and keyboard navigation for multi-field sorting
+    const sortHeaders = modal.querySelectorAll('.sortable-th');
+    sortHeaders.forEach((th) => {
+      const triggerSort = () => {
+        const field = th.dataset.sort;
+        if (field) this.handleStatementSort(field);
+      };
+      th.addEventListener('click', triggerSort);
+      th.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          triggerSort();
+        }
+      });
+    });
   }
 
   resetStatementModal() {
     this.parsedStatementTransactions = [];
+    this.statementSortField = null;
+    this.statementSortAsc = true;
+    this.updateStatementSortUI();
     const uploadZone = document.getElementById('statement-upload-zone');
     const loadingSection = document.getElementById('statement-loading');
     const reviewSection = document.getElementById('statement-review-section');
@@ -268,6 +289,8 @@ class BudgetApp {
 
       // Check duplicates against active ledger
       this.parsedStatementTransactions = window.statementParser.flagDuplicates(rawTransactions, this.transactions);
+      this.statementSortField = null;
+      this.statementSortAsc = true;
       this.renderStatementPreview();
     } catch (err) {
       console.error('Statement parsing failed:', err);
@@ -346,6 +369,59 @@ class BudgetApp {
     });
 
     this.updateStatementSummary();
+    this.updateStatementSortUI();
+  }
+
+  handleStatementSort(field) {
+    if (!this.parsedStatementTransactions || this.parsedStatementTransactions.length === 0) return;
+
+    if (this.statementSortField === field) {
+      this.statementSortAsc = !this.statementSortAsc;
+    } else {
+      this.statementSortField = field;
+      this.statementSortAsc = true;
+    }
+
+    this.sortStatementTransactions(this.statementSortField, this.statementSortAsc);
+    this.renderStatementPreview();
+  }
+
+  sortStatementTransactions(field, asc = true) {
+    if (!this.parsedStatementTransactions) return;
+
+    this.parsedStatementTransactions.sort((a, b) => {
+      let comparison = 0;
+      if (field === 'amount') {
+        comparison = (Number(a.amount) || 0) - (Number(b.amount) || 0);
+      } else if (field === 'date') {
+        const da = a.date ? new Date(a.date).getTime() : 0;
+        const db = b.date ? new Date(b.date).getTime() : 0;
+        comparison = da - db;
+      } else if (field === 'description') {
+        comparison = (a.description || '').localeCompare(b.description || '', undefined, { sensitivity: 'base' });
+      } else if (field === 'type') {
+        comparison = (a.type || '').localeCompare(b.type || '', undefined, { sensitivity: 'base' });
+      } else if (field === 'category') {
+        comparison = (a.category || '').localeCompare(b.category || '', undefined, { sensitivity: 'base' });
+      }
+      return asc ? comparison : -comparison;
+    });
+  }
+
+  updateStatementSortUI() {
+    const headers = document.querySelectorAll('#statement-preview-table .sortable-th');
+    headers.forEach((th) => {
+      const icon = th.querySelector('.sort-icon');
+      if (th.dataset.sort === this.statementSortField) {
+        th.classList.add('active-sort');
+        th.setAttribute('aria-sort', this.statementSortAsc ? 'ascending' : 'descending');
+        if (icon) icon.textContent = this.statementSortAsc ? '▲' : '▼';
+      } else {
+        th.classList.remove('active-sort');
+        th.removeAttribute('aria-sort');
+        if (icon) icon.textContent = '↕';
+      }
+    });
   }
 
   updateStatementSummary() {

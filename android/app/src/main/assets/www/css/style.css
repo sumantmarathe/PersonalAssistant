@@ -1048,6 +1048,41 @@ body {
   z-index: 2;
 }
 
+.statement-table th.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.statement-table th.sortable-th:hover {
+  background: #253347;
+  color: var(--text-primary);
+}
+
+.statement-table th.sortable-th:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: -2px;
+}
+
+.statement-table th.sortable-th.active-sort {
+  color: var(--accent-blue);
+  background: #223044;
+}
+
+.statement-table .sort-icon {
+  display: inline-block;
+  margin-left: 0.35rem;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  vertical-align: middle;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.statement-table th.sortable-th:hover .sort-icon,
+.statement-table th.sortable-th.active-sort .sort-icon {
+  opacity: 1;
+}
+
 .statement-table td {
   padding: 0.65rem 0.75rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);

@@ -252,12 +252,22 @@
             <table class="statement-table" id="statement-preview-table">
               <thead>
                 <tr>
-                  <th width="40"><input type="checkbox" id="stmt-check-master" checked></th>
-                  <th width="110">Date</th>
-                  <th>Description</th>
-                  <th width="100">Type</th>
-                  <th width="140">Category</th>
-                  <th width="120" style="text-align: right;">Amount (₹)</th>
+                  <th width="40"><input type="checkbox" id="stmt-check-master" checked title="Select or deselect all transactions"></th>
+                  <th width="115" class="sortable-th" data-sort="date" role="button" tabindex="0" title="Sort by Date">
+                    Date <span class="sort-icon">↕</span>
+                  </th>
+                  <th class="sortable-th" data-sort="description" role="button" tabindex="0" title="Sort by Description">
+                    Description <span class="sort-icon">↕</span>
+                  </th>
+                  <th width="100" class="sortable-th" data-sort="type" role="button" tabindex="0" title="Sort by Type">
+                    Type <span class="sort-icon">↕</span>
+                  </th>
+                  <th width="140" class="sortable-th" data-sort="category" role="button" tabindex="0" title="Sort by Category">
+                    Category <span class="sort-icon">↕</span>
+                  </th>
+                  <th width="130" class="sortable-th" data-sort="amount" role="button" tabindex="0" style="text-align: right;" title="Sort by Amount">
+                    Amount (₹) <span class="sort-icon">↕</span>
+                  </th>
                 </tr>
               </thead>
               <tbody id="statement-preview-tbody">
