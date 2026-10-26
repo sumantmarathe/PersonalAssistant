@@ -210,17 +210,41 @@
         <!-- Right Column: Ledger & Search Filters -->
         <section class="panel">
           <div class="ledger-header">
-            <h2 class="panel-title" style="margin-bottom: 0;"><span>📜</span> Transaction Ledger</h2>
-
-            <!-- Filters -->
-            <div class="filter-group">
-              <button class="filter-btn active" data-filter="all">All</button>
-              <button class="filter-btn" data-filter="income">Incomes</button>
-              <button class="filter-btn" data-filter="expense">Expenses</button>
+            <div class="ledger-title-row">
+              <h2 class="panel-title" style="margin-bottom: 0;"><span>📜</span> Transaction Ledger</h2>
+              <button id="btn-open-purge-modal" class="btn-secondary btn-sm" title="Purge records by date, account, or clear all">
+                <span>🧹</span> Purge / Bulk Clear
+              </button>
             </div>
 
-            <!-- Search -->
-            <input type="text" id="search-input" class="input-control search-input" placeholder="🔍 Search records...">
+            <div class="ledger-controls-row">
+              <!-- Filters -->
+              <div class="filter-group">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="income">Incomes</button>
+                <button class="filter-btn" data-filter="expense">Expenses</button>
+              </div>
+
+              <!-- Search -->
+              <input type="text" id="search-input" class="input-control search-input" placeholder="🔍 Search records...">
+            </div>
+          </div>
+
+          <!-- Bulk Selection Toolbar (Active when items checked) -->
+          <div id="ledger-bulk-toolbar" class="ledger-bulk-bar" style="display: none;">
+            <div class="bulk-bar-left">
+              <label class="checkbox-label bulk-select-all-label">
+                <input type="checkbox" id="ledger-check-master">
+                <span>Select All</span>
+              </label>
+              <span class="bulk-count-badge" id="bulk-selected-count">0 selected</span>
+            </div>
+            <div class="bulk-bar-actions">
+              <button type="button" id="btn-deselect-all-ledger" class="btn-text-subtle btn-sm">Deselect All</button>
+              <button type="button" id="btn-delete-selected" class="btn-danger btn-sm">
+                <span>🗑️</span> Delete (<span id="bulk-delete-count">0</span>)
+              </button>
+            </div>
           </div>
 
           <!-- Scrollable List of Records -->
@@ -539,6 +563,131 @@
         <div class="modal-footer">
           <button type="button" id="btn-cancel-account" class="btn-secondary">Cancel</button>
           <button type="submit" id="btn-save-account" class="btn-primary">Save Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Purge & Bulk Clear Records -->
+  <div id="modal-purge-records" class="modal-backdrop" style="display: none;">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <h3 class="modal-title"><span>🧹</span> Purge &amp; Bulk Remove Records</h3>
+        <button id="btn-close-purge-modal" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <form id="purge-form" autocomplete="off">
+        <div class="modal-body">
+          <p class="purge-dialog-description">
+            Safely remove a batch of transactions matching specific criteria, or wipe the entire transaction ledger.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">Purge Scope</label>
+            <div class="purge-scope-options">
+              <label class="purge-radio-option">
+                <input type="radio" name="purge-scope" value="all" checked>
+                <div>
+                  <strong>All Transactions</strong>
+                  <span class="option-desc">Permanently wipe all records from the transaction ledger.</span>
+                </div>
+              </label>
+
+              <label class="purge-radio-option">
+                <input type="radio" name="purge-scope" value="account">
+                <div>
+                  <strong>By Bank Account</strong>
+                  <span class="option-desc">Remove only transactions linked to a specific bank account.</span>
+                </div>
+              </label>
+
+              <label class="purge-radio-option">
+                <input type="radio" name="purge-scope" value="date_range">
+                <div>
+                  <strong>By Date Range</strong>
+                  <span class="option-desc">Remove transactions between specific start and end dates.</span>
+                </div>
+              </label>
+
+              <label class="purge-radio-option">
+                <input type="radio" name="purge-scope" value="older_than">
+                <div>
+                  <strong>Older Than Date</strong>
+                  <span class="option-desc">Remove historical transactions recorded before a chosen date.</span>
+                </div>
+              </label>
+
+              <label class="purge-radio-option">
+                <input type="radio" name="purge-scope" value="type">
+                <div>
+                  <strong>By Transaction Type</strong>
+                  <span class="option-desc">Remove only expenses or only incomes.</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Dynamic Parameter Group: Account Picker -->
+          <div class="form-group purge-param-group" id="purge-group-account" style="display: none;">
+            <label class="form-label" for="purge-account-select">Target Bank Account</label>
+            <select id="purge-account-select" class="input-control">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+
+          <!-- Dynamic Parameter Group: Date Range Picker -->
+          <div class="form-group purge-param-group" id="purge-group-date-range" style="display: none;">
+            <div class="date-range-fields">
+              <div>
+                <label class="form-label" for="purge-start-date">From Date</label>
+                <input type="date" id="purge-start-date" class="input-control">
+              </div>
+              <div>
+                <label class="form-label" for="purge-end-date">To Date</label>
+                <input type="date" id="purge-end-date" class="input-control">
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Parameter Group: Older Than Picker -->
+          <div class="form-group purge-param-group" id="purge-group-older-than" style="display: none;">
+            <label class="form-label" for="purge-cutoff-date">Purge Transactions Before</label>
+            <input type="date" id="purge-cutoff-date" class="input-control">
+          </div>
+
+          <!-- Dynamic Parameter Group: Type Picker -->
+          <div class="form-group purge-param-group" id="purge-group-type" style="display: none;">
+            <label class="form-label" for="purge-type-select">Transaction Type</label>
+            <select id="purge-type-select" class="input-control">
+              <option value="expense">Expenses Only</option>
+              <option value="income">Incomes Only</option>
+            </select>
+          </div>
+
+          <!-- Impact Preview & Warning Box -->
+          <div class="purge-preview-card">
+            <div class="purge-preview-icon">⚠️</div>
+            <div class="purge-preview-details">
+              <div class="purge-preview-title">Impact Assessment</div>
+              <div class="purge-preview-count" id="purge-preview-text">This will delete 0 transactions.</div>
+              <div class="purge-preview-note">Your bank account configurations and categories will remain untouched.</div>
+            </div>
+          </div>
+
+          <!-- Safety Confirmation Checkbox -->
+          <div class="form-group">
+            <label class="checkbox-label safety-confirm-label">
+              <input type="checkbox" id="purge-confirm-checkbox" required>
+              <span>I understand this will permanently delete matching transactions.</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="btn-cancel-purge" class="btn-secondary">Cancel</button>
+          <button type="submit" id="btn-execute-purge" class="btn-danger" disabled>
+            <span>🗑️</span> Permanently Delete
+          </button>
         </div>
       </form>
     </div>

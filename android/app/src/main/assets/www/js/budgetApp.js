@@ -22,6 +22,9 @@ class BudgetApp {
     this.statsStartDate = null;
     this.statsEndDate = null;
 
+    // Bulk Delete & Cherry-Pick Selection State
+    this.selectedTxIds = new Set();
+
     this.categories = {
       expense: [
         'Food & Dining',
@@ -215,7 +218,69 @@ class BudgetApp {
       accountForm.addEventListener('submit', (e) => this.handleSaveAccount(e));
     }
 
+    // Master checkbox in Ledger Bulk Toolbar
+    const ledgerMasterCheck = document.getElementById('ledger-check-master');
+    if (ledgerMasterCheck) {
+      ledgerMasterCheck.addEventListener('change', (e) => {
+        const isChecked = e.target.checked;
+        const currentFiltered = this.getFilteredTransactions();
+        if (isChecked) {
+          currentFiltered.forEach(t => this.selectedTxIds.add(t.id));
+        } else {
+          currentFiltered.forEach(t => this.selectedTxIds.delete(t.id));
+        }
+        this.renderLedger();
+      });
+    }
+
+    // Deselect All in Ledger Bulk Toolbar
+    const btnDeselectAllLedger = document.getElementById('btn-deselect-all-ledger');
+    if (btnDeselectAllLedger) {
+      btnDeselectAllLedger.addEventListener('click', () => {
+        this.selectedTxIds.clear();
+        this.renderLedger();
+      });
+    }
+
+    // Delete Selected in Ledger Bulk Toolbar
+    const btnDeleteSelected = document.getElementById('btn-delete-selected');
+    if (btnDeleteSelected) {
+      btnDeleteSelected.addEventListener('click', async () => {
+        const count = this.selectedTxIds.size;
+        if (count === 0) return;
+        const confirmed = window.confirm(`Are you sure you want to permanently delete the ${count} selected transaction${count === 1 ? '' : 's'}?`);
+        if (!confirmed) return;
+
+        await this.storage.deleteTransactionsBatch(Array.from(this.selectedTxIds));
+        this.selectedTxIds.clear();
+        await this.loadAndRender();
+        this.triggerAutoSync();
+        this.showToast(`Deleted ${count} transaction${count === 1 ? '' : 's'}.`, 'success');
+      });
+    }
+
+    // Transaction List checkbox event delegation
+    const txList = document.getElementById('transaction-list');
+    if (txList) {
+      txList.addEventListener('change', (e) => {
+        if (e.target && e.target.classList.contains('tx-select-checkbox')) {
+          const id = e.target.dataset.id;
+          if (e.target.checked) {
+            this.selectedTxIds.add(id);
+          } else {
+            this.selectedTxIds.delete(id);
+          }
+          const item = e.target.closest('.transaction-item');
+          if (item) {
+            item.classList.toggle('selected', e.target.checked);
+          }
+          this.updateBulkToolbar();
+        }
+      });
+    }
+
     this.initStatementImporter();
+    this.initPurgeModal();
   }
 
   initStatementImporter() {
@@ -798,11 +863,8 @@ class BudgetApp {
     }
   }
 
-  renderLedger() {
-    const listContainer = document.getElementById('transaction-list');
-    if (!listContainer) return;
-
-    const filtered = this.transactions.filter((tx) => {
+  getFilteredTransactions() {
+    return this.transactions.filter((tx) => {
       const matchesAccount = !this.activeAccountId || this.activeAccountId === 'all' || tx.accountId === this.activeAccountId;
       const matchesType = this.filterType === 'all' || tx.type === this.filterType;
       const matchesSearch = !this.searchQuery ||
@@ -810,6 +872,46 @@ class BudgetApp {
         (tx.description && tx.description.toLowerCase().includes(this.searchQuery));
       return matchesAccount && matchesType && matchesSearch;
     });
+  }
+
+  updateBulkToolbar(filtered = null) {
+    const toolbar = document.getElementById('ledger-bulk-toolbar');
+    const selectedBadge = document.getElementById('bulk-selected-count');
+    const deleteCount = document.getElementById('bulk-delete-count');
+    const masterCheck = document.getElementById('ledger-check-master');
+
+    const count = this.selectedTxIds.size;
+    if (!toolbar) return;
+
+    if (count > 0) {
+      toolbar.style.display = 'flex';
+      if (selectedBadge) selectedBadge.textContent = `${count} selected`;
+      if (deleteCount) deleteCount.textContent = count;
+    } else {
+      toolbar.style.display = 'none';
+    }
+
+    if (masterCheck) {
+      const currentFiltered = filtered || this.getFilteredTransactions();
+      if (currentFiltered.length > 0 && currentFiltered.every(t => this.selectedTxIds.has(t.id))) {
+        masterCheck.checked = true;
+        masterCheck.indeterminate = false;
+      } else if (currentFiltered.some(t => this.selectedTxIds.has(t.id))) {
+        masterCheck.checked = false;
+        masterCheck.indeterminate = true;
+      } else {
+        masterCheck.checked = false;
+        masterCheck.indeterminate = false;
+      }
+    }
+  }
+
+  renderLedger() {
+    const listContainer = document.getElementById('transaction-list');
+    if (!listContainer) return;
+
+    const filtered = this.getFilteredTransactions();
+    this.updateBulkToolbar(filtered);
 
     if (filtered.length === 0) {
       listContainer.innerHTML = `
@@ -827,12 +929,16 @@ class BudgetApp {
       const sign = isIncome ? '+' : '-';
       const icon = isIncome ? '📈' : '📉';
       const badgeClass = isIncome ? 'income' : 'expense';
+      const isSelected = this.selectedTxIds.has(tx.id);
 
       const acc = this.accounts.find(a => a.id === tx.accountId);
       const accBadge = acc ? `<span class="tx-account-badge">🏦 ${this.escapeHtml(acc.bankName)} (${this.escapeHtml(this.maskAccountNumber(acc.accountNumber))})</span>` : '';
 
       return `
-        <div class="transaction-item" data-id="${tx.id}">
+        <div class="transaction-item ${isSelected ? 'selected' : ''}" data-id="${tx.id}">
+          <div class="tx-checkbox-cell">
+            <input type="checkbox" class="tx-select-checkbox" data-id="${tx.id}" ${isSelected ? 'checked' : ''} aria-label="Select transaction">
+          </div>
           <div class="tx-left">
             <div class="tx-icon-badge ${badgeClass}">${icon}</div>
             <div class="tx-info">
@@ -894,10 +1000,222 @@ class BudgetApp {
 
   async handleDelete(id) {
     if (!id) return;
+    this.selectedTxIds.delete(id);
     await this.storage.deleteTransaction(id);
     this.showToast('Transaction removed.', 'success');
     await this.loadAndRender();
     this.triggerAutoSync(); // Silently auto-sync to user's Google account
+  }
+
+  initPurgeModal() {
+    const btnOpen = document.getElementById('btn-open-purge-modal');
+    const modal = document.getElementById('modal-purge-records');
+    const btnClose = document.getElementById('btn-close-purge-modal');
+    const btnCancel = document.getElementById('btn-cancel-purge');
+    const purgeForm = document.getElementById('purge-form');
+    const confirmCheck = document.getElementById('purge-confirm-checkbox');
+    const scopeRadios = document.querySelectorAll('input[name="purge-scope"]');
+
+    if (!modal) return;
+
+    const openModal = () => {
+      this.populatePurgeModal();
+      modal.style.display = 'flex';
+    };
+
+    const closeModal = () => {
+      modal.style.display = 'none';
+    };
+
+    if (btnOpen) btnOpen.addEventListener('click', openModal);
+    if (btnClose) btnClose.addEventListener('click', closeModal);
+    if (btnCancel) btnCancel.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    scopeRadios.forEach((radio) => {
+      radio.addEventListener('change', () => {
+        this.updatePurgeScopeUI();
+      });
+    });
+
+    const purgeInputs = [
+      'purge-account-select',
+      'purge-start-date',
+      'purge-end-date',
+      'purge-cutoff-date',
+      'purge-type-select'
+    ];
+    purgeInputs.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', () => this.updatePurgePreview());
+        el.addEventListener('input', () => this.updatePurgePreview());
+      }
+    });
+
+    if (confirmCheck) {
+      confirmCheck.addEventListener('change', () => {
+        this.updatePurgeExecuteButton();
+      });
+    }
+
+    if (purgeForm) {
+      purgeForm.addEventListener('submit', (e) => this.handlePurgeSubmit(e));
+    }
+  }
+
+  populatePurgeModal() {
+    const accSelect = document.getElementById('purge-account-select');
+    if (accSelect) {
+      accSelect.innerHTML = '<option value="">-- Choose Account --</option>';
+      this.accounts.forEach((acc) => {
+        const opt = document.createElement('option');
+        opt.value = acc.id;
+        opt.textContent = `${acc.bankName} (${this.maskAccountNumber(acc.accountNumber)})`;
+        accSelect.appendChild(opt);
+      });
+      const unassignedOpt = document.createElement('option');
+      unassignedOpt.value = 'unassigned';
+      unassignedOpt.textContent = 'Unassigned / No Account';
+      accSelect.appendChild(unassignedOpt);
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const cutoffInput = document.getElementById('purge-cutoff-date');
+    if (cutoffInput && !cutoffInput.value) {
+      cutoffInput.value = today;
+    }
+    const endInput = document.getElementById('purge-end-date');
+    if (endInput && !endInput.value) {
+      endInput.value = today;
+    }
+    const startInput = document.getElementById('purge-start-date');
+    if (startInput && !startInput.value) {
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
+      startInput.value = thirtyDaysAgo;
+    }
+
+    const radioAll = document.querySelector('input[name="purge-scope"][value="all"]');
+    if (radioAll) radioAll.checked = true;
+
+    const confirmCheck = document.getElementById('purge-confirm-checkbox');
+    if (confirmCheck) confirmCheck.checked = false;
+
+    this.updatePurgeScopeUI();
+  }
+
+  updatePurgeScopeUI() {
+    const selectedScope = (document.querySelector('input[name="purge-scope"]:checked') || {}).value || 'all';
+
+    const groupAccount = document.getElementById('purge-group-account');
+    const groupDateRange = document.getElementById('purge-group-date-range');
+    const groupOlderThan = document.getElementById('purge-group-older-than');
+    const groupType = document.getElementById('purge-group-type');
+
+    if (groupAccount) groupAccount.style.display = selectedScope === 'account' ? 'block' : 'none';
+    if (groupDateRange) groupDateRange.style.display = selectedScope === 'date_range' ? 'block' : 'none';
+    if (groupOlderThan) groupOlderThan.style.display = selectedScope === 'older_than' ? 'block' : 'none';
+    if (groupType) groupType.style.display = selectedScope === 'type' ? 'block' : 'none';
+
+    this.updatePurgePreview();
+  }
+
+  getMatchingPurgeTransactions() {
+    const selectedScope = (document.querySelector('input[name="purge-scope"]:checked') || {}).value || 'all';
+
+    if (selectedScope === 'all') {
+      return this.transactions;
+    } else if (selectedScope === 'account') {
+      const targetAcc = (document.getElementById('purge-account-select') || {}).value;
+      if (!targetAcc) return [];
+      if (targetAcc === 'unassigned') {
+        return this.transactions.filter(t => !t.accountId);
+      }
+      return this.transactions.filter(t => t.accountId === targetAcc);
+    } else if (selectedScope === 'date_range') {
+      const start = (document.getElementById('purge-start-date') || {}).value;
+      const end = (document.getElementById('purge-end-date') || {}).value;
+      return this.transactions.filter(t => {
+        if (start && t.date < start) return false;
+        if (end && t.date > end) return false;
+        return true;
+      });
+    } else if (selectedScope === 'older_than') {
+      const cutoff = (document.getElementById('purge-cutoff-date') || {}).value;
+      if (!cutoff) return [];
+      return this.transactions.filter(t => t.date < cutoff);
+    } else if (selectedScope === 'type') {
+      const type = (document.getElementById('purge-type-select') || {}).value || 'expense';
+      return this.transactions.filter(t => t.type === type);
+    }
+    return [];
+  }
+
+  updatePurgePreview() {
+    const matching = this.getMatchingPurgeTransactions();
+    const previewText = document.getElementById('purge-preview-text');
+    if (previewText) {
+      previewText.textContent = `This will permanently delete ${matching.length} transaction${matching.length === 1 ? '' : 's'}.`;
+    }
+    this.updatePurgeExecuteButton();
+  }
+
+  updatePurgeExecuteButton() {
+    const btnExecute = document.getElementById('btn-execute-purge');
+    const confirmCheck = document.getElementById('purge-confirm-checkbox');
+    const matching = this.getMatchingPurgeTransactions();
+
+    if (btnExecute) {
+      const isConfirmed = confirmCheck && confirmCheck.checked;
+      btnExecute.disabled = !isConfirmed || matching.length === 0;
+    }
+  }
+
+  async handlePurgeSubmit(e) {
+    e.preventDefault();
+    const matching = this.getMatchingPurgeTransactions();
+    if (matching.length === 0) {
+      this.showToast('No transactions match the selected purge criteria.', 'error');
+      return;
+    }
+
+    const selectedScope = (document.querySelector('input[name="purge-scope"]:checked') || {}).value || 'all';
+    const count = matching.length;
+
+    const btnExecute = document.getElementById('btn-execute-purge');
+    if (btnExecute) {
+      btnExecute.disabled = true;
+      btnExecute.innerHTML = '<span>⏳</span> Deleting...';
+    }
+
+    try {
+      if (selectedScope === 'all') {
+        await this.storage.clearAllTransactions();
+      } else {
+        const ids = matching.map(t => t.id);
+        await this.storage.deleteTransactionsBatch(ids);
+      }
+
+      this.selectedTxIds.clear();
+      const modal = document.getElementById('modal-purge-records');
+      if (modal) modal.style.display = 'none';
+
+      await this.loadAndRender();
+      this.triggerAutoSync();
+
+      this.showToast(`🗑️ Purge complete: ${count} transaction${count === 1 ? '' : 's'} removed.`, 'success');
+    } catch (err) {
+      console.error('Purge execution error:', err);
+      this.showToast('Purge failed: ' + err.message, 'error');
+    } finally {
+      if (btnExecute) {
+        btnExecute.disabled = false;
+        btnExecute.innerHTML = '<span>🗑️</span> Permanently Delete';
+      }
+    }
   }
 
   async handleExportBackup() {
