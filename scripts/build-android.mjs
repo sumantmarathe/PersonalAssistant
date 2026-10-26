@@ -44,6 +44,16 @@ function copyDirRecursive(src, dest) {
 copyDirRecursive(path.resolve(rootDir, 'css'), path.resolve(assetsDir, 'css'));
 copyDirRecursive(path.resolve(rootDir, 'js'), path.resolve(assetsDir, 'js'));
 
+if (fs.existsSync(path.resolve(rootDir, 'icons'))) {
+  copyDirRecursive(path.resolve(rootDir, 'icons'), path.resolve(assetsDir, 'icons'));
+}
+if (fs.existsSync(path.resolve(rootDir, 'manifest.json'))) {
+  fs.copyFileSync(path.resolve(rootDir, 'manifest.json'), path.resolve(assetsDir, 'manifest.json'));
+}
+if (fs.existsSync(path.resolve(rootDir, 'sw.js'))) {
+  fs.copyFileSync(path.resolve(rootDir, 'sw.js'), path.resolve(assetsDir, 'sw.js'));
+}
+
 const filesCount = fs.readdirSync(assetsDir, { recursive: true }).length;
 console.log(`      Copied ${filesCount} assets into www/ container.`);
 
