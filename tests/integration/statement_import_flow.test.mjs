@@ -64,3 +64,11 @@ test('Integration: End-to-End Bank Statement Import & Storage Batch Pipeline', a
   assert.equal(totalExpense, 2330.0);
   assert.equal(totalIncome - totalExpense, 122170.0);
 });
+
+test('Integration: Statement Importer auto-sync linkage calls valid BudgetApp method', () => {
+  const budgetAppContent = fs.readFileSync(path.join(rootDir, 'js', 'budgetApp.js'), 'utf8');
+
+  // Verify commitStatementImport does not invoke the non-existent syncToCloudBackground
+  assert.ok(!budgetAppContent.includes('syncToCloudBackground'), 'Must not reference undefined syncToCloudBackground method');
+  assert.ok(budgetAppContent.includes('this.triggerAutoSync()'), 'Must invoke valid triggerAutoSync method');
+});

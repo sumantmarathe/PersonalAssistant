@@ -406,8 +406,8 @@ class BudgetApp {
       await this.storage.batchAddTransactions(toSave);
       await this.loadAndRender();
 
-      // Trigger background sync to Google Drive
-      this.syncToCloudBackground();
+      // Silently auto-sync to user's Google account if connected
+      this.triggerAutoSync();
 
       // Close modal
       const modal = document.getElementById('modal-import-statement');
