@@ -206,6 +206,98 @@ class StorageService {
   }
 
   /**
+   * Deletes multiple transactions by ID array in a single batch
+   * @param {Array<string>} ids
+   * @returns {Promise<number>} count of deleted transactions
+   */
+  async deleteTransactionsBatch(ids) {
+    if (!ids || ids.length === 0) return 0;
+    const idSet = new Set(ids);
+
+    if (this.db) {
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction([this.storeName], 'readwrite');
+          const store = tx.objectStore(this.storeName);
+          for (const id of idSet) {
+            store.delete(id);
+          }
+          tx.oncomplete = () => resolve(idSet.size);
+          tx.onerror = () => {
+            this._deleteBatchLocalStorageFallback(idSet);
+            resolve(idSet.size);
+          };
+        } catch (e) {
+          this._deleteBatchLocalStorageFallback(idSet);
+          resolve(idSet.size);
+        }
+      });
+    }
+
+    this._deleteBatchLocalStorageFallback(idSet);
+    return idSet.size;
+  }
+
+  /**
+   * Clears all transactions while preserving registered bank accounts
+   * @returns {Promise<boolean>}
+   */
+  async clearAllTransactions() {
+    if (this.db) {
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction([this.storeName], 'readwrite');
+          const store = tx.objectStore(this.storeName);
+          const request = store.clear();
+          request.onsuccess = () => resolve(true);
+          request.onerror = () => {
+            this._clearTransactionsLocalStorageFallback();
+            resolve(true);
+          };
+        } catch (e) {
+          this._clearTransactionsLocalStorageFallback();
+          resolve(true);
+        }
+      });
+    }
+
+    this._clearTransactionsLocalStorageFallback();
+    return true;
+  }
+
+  /**
+   * Purges transactions matching given filter criteria
+   * @param {Object} filter { accountId, startDate, endDate, type }
+   * @returns {Promise<number>} number of deleted records
+   */
+  async purgeTransactions(filter = {}) {
+    const all = await this.getAllTransactions();
+    const toDelete = all.filter((t) => {
+      if (filter.accountId && filter.accountId !== 'all') {
+        if (filter.accountId === 'unassigned') {
+          if (t.accountId) return false;
+        } else if (t.accountId !== filter.accountId) {
+          return false;
+        }
+      }
+      if (filter.type && filter.type !== 'all' && t.type !== filter.type) {
+        return false;
+      }
+      if (filter.startDate && t.date < filter.startDate) {
+        return false;
+      }
+      if (filter.endDate && t.date > filter.endDate) {
+        return false;
+      }
+      return true;
+    });
+
+    const ids = toDelete.map((t) => t.id);
+    await this.deleteTransactionsBatch(ids);
+    return ids.length;
+  }
+
+  /**
    * Exports an encrypted or standard backup envelope JSON
    * @returns {Promise<string>} JSON string
    */
@@ -415,6 +507,25 @@ class StorageService {
       localStorage.setItem(this.fallbackKey, JSON.stringify(filtered));
     } catch (e) {
       console.error('LocalStorage delete error', e);
+    }
+  }
+
+  _deleteBatchLocalStorageFallback(idSet) {
+    try {
+      const set = idSet instanceof Set ? idSet : new Set(idSet);
+      const items = this._getLocalStorageFallback();
+      const filtered = items.filter((t) => !set.has(t.id));
+      localStorage.setItem(this.fallbackKey, JSON.stringify(filtered));
+    } catch (e) {
+      console.error('LocalStorage batch delete error', e);
+    }
+  }
+
+  _clearTransactionsLocalStorageFallback() {
+    try {
+      localStorage.removeItem(this.fallbackKey);
+    } catch (e) {
+      console.error('LocalStorage clear error', e);
     }
   }
 
