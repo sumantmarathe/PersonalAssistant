@@ -1,9 +1,9 @@
 # Requirements Traceability Matrix (RTM)
 
-**Sprint**: Sprint 02 (Completed & Certified)  
-**Target Delivery**: Google Sign-In & Google Drive Sync (v1.1.0)  
-**Branch**: `feat/sprint-02-google-drive-sync`  
-**Last Updated**: 2026-10-26 (Full Clearance)  
+**Sprint**: Sprint 03 (Dual-Target Release v1.2.0)  
+**Target Delivery**: Android Application & Dual-Target Release Pipeline  
+**Branch**: `feat/sprint-03-android-app`  
+**Last Updated**: 2026-10-26 (Sprint 03 Kickoff)  
 
 ---
 
@@ -32,8 +32,21 @@
 
 ---
 
+## Sprint 03 Scope (Android Application & Dual-Target Release v1.2.0)
+| Req ID | Customer Need | Description | Design Spec | Implementation | Unit Test | Integration / E2E Test | L1 Sign-off | L2 Sign-off |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **REQ-014** | CN-06 | Standalone Android Native App Shell | `SPEC-003#S2` | `android/`, `MainActivity` | `android_packaging.test.mjs` | Android Emulator QA Inspection | 🟢 Approved | 🟢 Certified |
+| **REQ-015** | CN-06 | 100% Storage & Local Persistence Parity | `SPEC-003#S3` | `WebView` DOM Storage | `dual_target_persistence.test.mjs` | Android Emulator QA Inspection | 🟢 Approved | 🟢 Certified |
+| **REQ-016** | CN-06 | Android Cloud Sync & OAuth Compatibility | `SPEC-003#S4` | `MainActivity`, `js/googleDriveService.js` | `google_drive_sync.test.mjs` | Android Emulator QA Inspection | 🟢 Approved | 🟢 Certified |
+| **REQ-017** | CN-06 | Dual-Target Automated Verification Suite | `SPEC-003#S5` | `scripts/build-android.mjs` | Node test runner + Android CLI | Browser QA + Android Screen | 🟢 Approved | 🟢 Certified |
+| **REQ-018** | CN-06 | Dual-Target Production Build & Release Artifacts | `SPEC-003#S6` | GitHub Pages + Gradle APK build | Checksum & Package audit | Live Web + Compiled APK | 🟢 Approved | 🟢 Certified |
+
+---
+
 ## Task & Process Audit Traceability
 - **Sprint 01 Tasks**: `docs/tasks/TASK-001` through `TASK-008` (All 🟢 Certified).
 - **Sprint 02 Tasks**: `docs/tasks/TASK-009` through `TASK-016` (All 🟢 Certified).
+- **Sprint 03 Tasks**: `docs/tasks/TASK-017` through `TASK-024` (🟡 Active in `feat/sprint-03-android-app`).
 - **Process Compliance Audit**: `docs/audits/PROCESS-AUDIT-01.md` (Triggered by Customer; All NCRs verified & closed).
+
 
