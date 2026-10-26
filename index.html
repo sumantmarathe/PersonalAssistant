@@ -93,13 +93,19 @@
     <div class="navigation-toolbar">
       <nav class="app-tab-navigation" role="tablist" aria-label="Main Navigation">
         <button class="app-tab-btn active" id="tab-btn-ledger" role="tab" aria-selected="true" data-tab="tab-ledger">
-          <span>📜</span> Ledger & Entry
+          <span class="tab-icon">📜</span>
+          <span class="tab-label-full">Ledger &amp; Entry</span>
+          <span class="tab-label-short">Ledger</span>
         </button>
         <button class="app-tab-btn" id="tab-btn-stats" role="tab" aria-selected="false" data-tab="tab-stats">
-          <span>📊</span> Analytics & Stats
+          <span class="tab-icon">📊</span>
+          <span class="tab-label-full">Analytics &amp; Stats</span>
+          <span class="tab-label-short">Stats</span>
         </button>
         <button class="app-tab-btn" id="tab-btn-accounts" role="tab" aria-selected="false" data-tab="tab-accounts">
-          <span>🏦</span> Accounts (<span id="tab-account-count">0</span>)
+          <span class="tab-icon">🏦</span>
+          <span>Accounts</span>
+          <span class="tab-account-badge" id="tab-account-count">0</span>
         </button>
       </nav>
 
