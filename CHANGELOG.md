@@ -4,6 +4,26 @@ All notable changes to this project are documented in this file following the Ke
 
 ---
 
+## [v1.1.0] - 2026-10-26 (Sprint 02 Delivery)
+
+### Added
+- **Google Identity Services (OAuth 2.0)**:
+  - Official Google-branded "Connect Drive" integration using Google Identity Services (GIS).
+  - Secure in-memory token lifecycle with session revocation on disconnect.
+- **Personal Google Drive Cloud Sync**:
+  - **Sync to Drive**: Directly uploads/updates `personal_assistant_budget_backup.json` to the user's private Google Drive.
+  - **Restore from Drive**: Seamlessly downloads and restores the latest cloud backup into local IndexedDB across PCs and mobile phones.
+  - Least-privilege scope (`https://www.googleapis.com/auth/drive.file`) ensuring zero access to other Drive files.
+- **Custom OAuth Client ID Configuration**:
+  - Added Settings modal (⚙️ gear icon) allowing users to configure custom Google OAuth 2.0 Web Client IDs.
+- **V-Cycle Test & Governance Suite**:
+  - 6 new automated unit tests (`17/17` total passing).
+  - Cross-device sync integration test verifying PC-to-Mobile rehydration (`4/4` total passing).
+  - Browser E2E validation recording artifact.
+  - L1 Technical Review and L2 Principal Meta-Audit certifications.
+
+---
+
 ## [v1.0.0] - 2026-10-26 (Sprint 01 Delivery)
 
 ### Added
@@ -20,8 +40,3 @@ All notable changes to this project are documented in this file following the Ke
   - One-click Local Backup Export (structured JSON file) for easy transfer to mobile or other PCs.
   - One-click Local Backup Restore (JSON import) with schema validation.
 - **Responsive Design**: Mobile touch-optimized controls and multi-column desktop layout.
-- **Governance & Verification Suite**:
-  - Automated unit test suite (`11/11` passed).
-  - Automated integration test suite (`3/3` passed).
-  - Browser E2E session recording artifact.
-  - L1 Technical Verification and L2 Principal Meta-Audit certifications.

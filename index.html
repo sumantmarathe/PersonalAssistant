@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Personal Assistant • Budget & Expense Planner</title>
   <link rel="stylesheet" href="css/style.css">
-  <meta name="description" content="Privacy-first, zero-knowledge personal finance and budget planner. Stores 100% locally on your device with no external server tracking.">
+  <meta name="description" content="Privacy-first, zero-knowledge personal finance and budget planner. Stores 100% locally on your device with direct personal Google Drive cloud sync.">
 </head>
 <body>
 
@@ -33,14 +33,47 @@
         </button>
       </nav>
 
-      <!-- Data Portability Controls (Cross-Device JSON Backup) -->
+      <!-- Data Portability & Cloud Sync Controls -->
       <div class="header-actions">
+        <!-- Google Drive Connect Button (Disconnected State) -->
+        <div id="drive-connect-container" class="drive-connect-wrapper">
+          <button id="btn-connect-drive" class="btn-google" title="Connect your personal Google Drive for cloud backup">
+            <svg class="google-icon" viewBox="0 0 24 24" width="16" height="16">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span>Connect Drive</span>
+          </button>
+        </div>
+
+        <!-- Google Drive Connected Controls -->
+        <div id="drive-connected-container" class="drive-connected-wrapper" style="display: none;">
+          <span class="user-chip" id="drive-user-email">Google Connected</span>
+          <button id="btn-sync-drive" class="btn-secondary" title="Save current ledger to your personal Google Drive">
+            <span>☁️</span> Sync
+          </button>
+          <button id="btn-restore-drive" class="btn-secondary" title="Fetch latest backup from your personal Google Drive">
+            <span>📥</span> Restore
+          </button>
+          <button id="btn-disconnect-drive" class="btn-icon" title="Disconnect Google Drive">
+            ✕
+          </button>
+        </div>
+
+        <!-- Local File Backup Fallback -->
         <input type="file" id="import-file-input" accept=".json,application/json" style="display: none;">
-        <button id="btn-import-trigger" class="btn-secondary" title="Restore transactions from a local JSON backup file">
-          <span>📥</span> Import
+        <button id="btn-import-trigger" class="btn-secondary" title="Restore from a local file">
+          <span>📁</span> Import File
         </button>
-        <button id="btn-export-backup" class="btn-secondary" title="Download encrypted/structured JSON backup for PC or Mobile">
-          <span>💾</span> Backup
+        <button id="btn-export-backup" class="btn-secondary" title="Download backup file">
+          <span>💾</span> Backup File
+        </button>
+
+        <!-- Settings Gear -->
+        <button id="btn-open-settings" class="btn-icon" title="Cloud Sync Settings">
+          ⚙️
         </button>
       </div>
     </div>
@@ -53,7 +86,7 @@
     <div class="privacy-banner">
       <span>🛡️</span>
       <div>
-        <strong>Zero-Knowledge Privacy:</strong> All entries are stored exclusively inside your browser's persistent IndexedDB. No financial records ever touch a remote server.
+        <strong>Privacy-First Cloud Sync:</strong> When Google Drive is connected, backups are uploaded directly to your own Google Drive using restricted app permissions. No intermediary server ever touches your data.
       </div>
     </div>
 
@@ -153,8 +186,38 @@
     </div>
   </main>
 
+  <!-- Cloud Sync Settings Modal -->
+  <div id="settings-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>⚙️ Cloud Sync & Google OAuth Settings</h3>
+        <button id="btn-close-settings" class="btn-icon">✕</button>
+      </div>
+      <form id="settings-form">
+        <div class="modal-body">
+          <p class="modal-desc">
+            To connect with Google Drive, you can provide your Google Cloud OAuth 2.0 Web Client ID, authorized for <code>https://sumantmarathe.github.io</code>.
+          </p>
+          <div class="form-group">
+            <label class="form-label" for="setting-client-id">Google OAuth 2.0 Client ID</label>
+            <input type="text" id="setting-client-id" class="input-control" placeholder="e.g. xxxxxxxx.apps.googleusercontent.com">
+          </div>
+          <div class="info-box">
+            <strong>Security Note:</strong> The Client ID is stored locally in your browser and used only to request an authorization token directly from Google.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn-submit" style="margin-top: 0; width: auto; padding: 0.6rem 1.25rem;">
+            Save Settings
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Script Modules -->
   <script src="js/storage.js"></script>
+  <script src="js/googleDriveService.js"></script>
   <script src="js/budgetApp.js"></script>
   <script src="js/app.js"></script>
 </body>

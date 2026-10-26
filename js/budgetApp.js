@@ -1,10 +1,11 @@
 /**
  * BudgetApp - Sub-Application Controller for Budget & Expense Planner
- * Implements REQ-002 through REQ-008
+ * Implements REQ-002 through REQ-013 (including Google Drive Cloud Sync)
  */
 class BudgetApp {
   constructor() {
     this.storage = window.storageService;
+    this.driveService = window.googleDriveService;
     this.transactions = [];
     this.filterType = 'all';
     this.searchQuery = '';
@@ -35,6 +36,13 @@ class BudgetApp {
 
   async init() {
     await this.storage.init();
+    if (this.driveService) {
+      await this.driveService.init();
+      this.driveService.onStateChange((connected, email) => {
+        this.updateDriveUI(connected, email);
+      });
+    }
+
     this.bindEvents();
     this.populateCategoryOptions();
     this.setDefaultDate();
@@ -77,18 +85,140 @@ class BudgetApp {
       });
     }
 
-    // Export Backup
+    // Export Backup (Local)
     const exportBtn = document.getElementById('btn-export-backup');
     if (exportBtn) {
       exportBtn.addEventListener('click', () => this.handleExportBackup());
     }
 
-    // Import Backup Trigger
+    // Import Backup Trigger (Local)
     const importBtn = document.getElementById('btn-import-trigger');
     const importFileInput = document.getElementById('import-file-input');
     if (importBtn && importFileInput) {
       importBtn.addEventListener('click', () => importFileInput.click());
       importFileInput.addEventListener('change', (e) => this.handleImportBackup(e));
+    }
+
+    // Google Drive Connect / Disconnect
+    const btnConnectDrive = document.getElementById('btn-connect-drive');
+    if (btnConnectDrive) {
+      btnConnectDrive.addEventListener('click', () => this.handleDriveAuth());
+    }
+
+    const btnDisconnectDrive = document.getElementById('btn-disconnect-drive');
+    if (btnDisconnectDrive) {
+      btnDisconnectDrive.addEventListener('click', () => this.handleDriveSignOut());
+    }
+
+    // Google Drive Cloud Sync
+    const btnSyncDrive = document.getElementById('btn-sync-drive');
+    if (btnSyncDrive) {
+      btnSyncDrive.addEventListener('click', () => this.handleSyncToDrive());
+    }
+
+    // Google Drive Cloud Restore
+    const btnRestoreDrive = document.getElementById('btn-restore-drive');
+    if (btnRestoreDrive) {
+      btnRestoreDrive.addEventListener('click', () => this.handleRestoreFromDrive());
+    }
+
+    // Settings Modal
+    const btnOpenSettings = document.getElementById('btn-open-settings');
+    const btnCloseSettings = document.getElementById('btn-close-settings');
+    const settingsModal = document.getElementById('settings-modal');
+    const formSettings = document.getElementById('settings-form');
+
+    if (btnOpenSettings && settingsModal) {
+      btnOpenSettings.addEventListener('click', () => {
+        const inputClientId = document.getElementById('setting-client-id');
+        if (inputClientId && this.driveService) {
+          inputClientId.value = this.driveService.getClientId();
+        }
+        settingsModal.style.display = 'flex';
+      });
+    }
+
+    if (btnCloseSettings && settingsModal) {
+      btnCloseSettings.addEventListener('click', () => {
+        settingsModal.style.display = 'none';
+      });
+    }
+
+    if (formSettings) {
+      formSettings.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const inputClientId = document.getElementById('setting-client-id');
+        if (inputClientId && this.driveService) {
+          this.driveService.setCustomClientId(inputClientId.value);
+          this.showToast('Google OAuth Client ID saved!', 'success');
+        }
+        if (settingsModal) settingsModal.style.display = 'none';
+      });
+    }
+  }
+
+  updateDriveUI(connected, email) {
+    const connectContainer = document.getElementById('drive-connect-container');
+    const connectedContainer = document.getElementById('drive-connected-container');
+    const emailBadge = document.getElementById('drive-user-email');
+
+    if (connected) {
+      if (connectContainer) connectContainer.style.display = 'none';
+      if (connectedContainer) connectedContainer.style.display = 'flex';
+      if (emailBadge) emailBadge.textContent = email || 'Google Account';
+    } else {
+      if (connectContainer) connectContainer.style.display = 'inline-flex';
+      if (connectedContainer) connectedContainer.style.display = 'none';
+    }
+  }
+
+  async handleDriveAuth() {
+    try {
+      this.showToast('Connecting to Google...', 'success');
+      await this.driveService.signIn();
+      this.showToast('Connected to Google Drive!', 'success');
+    } catch (err) {
+      console.error(err);
+      this.showToast(err.message || 'Failed to connect to Google Drive.', 'error');
+    }
+  }
+
+  async handleDriveSignOut() {
+    try {
+      await this.driveService.signOut();
+      this.showToast('Google Drive disconnected.', 'success');
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async handleSyncToDrive() {
+    try {
+      this.showToast('Syncing budget data to Google Drive...', 'success');
+      const backupJson = await this.storage.exportBackup();
+      const result = await this.driveService.uploadBackup(backupJson);
+      this.showToast(`Synced to Google Drive at ${result.timestamp}!`, 'success');
+    } catch (err) {
+      console.error(err);
+      this.showToast(err.message || 'Google Drive sync failed.', 'error');
+    }
+  }
+
+  async handleRestoreFromDrive() {
+    try {
+      this.showToast('Fetching latest backup from Google Drive...', 'success');
+      const jsonContent = await this.driveService.downloadBackup();
+      const importResult = await this.storage.importBackup(jsonContent);
+
+      if (importResult.success) {
+        this.showToast(importResult.message, 'success');
+        await this.loadAndRender();
+      } else {
+        this.showToast(importResult.message, 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      this.showToast(err.message || 'Failed to restore from Google Drive.', 'error');
     }
   }
 
@@ -175,7 +305,6 @@ class BudgetApp {
     const listContainer = document.getElementById('transaction-list');
     if (!listContainer) return;
 
-    // Filter by type & search
     const filtered = this.transactions.filter((tx) => {
       const matchesType = this.filterType === 'all' || tx.type === this.filterType;
       const matchesSearch = !this.searchQuery ||
@@ -250,7 +379,6 @@ class BudgetApp {
     await this.storage.addTransaction(transaction);
     this.showToast(`${this.activeFormType === 'income' ? 'Income' : 'Expense'} added successfully!`, 'success');
 
-    // Reset inputs
     amountInput.value = '';
     descInput.value = '';
     this.setDefaultDate();
@@ -294,7 +422,7 @@ class BudgetApp {
       } else {
         this.showToast(result.message, 'error');
       }
-      e.target.value = ''; // Reset input
+      e.target.value = '';
     };
     reader.onerror = () => {
       this.showToast('Failed to read the backup file.', 'error');

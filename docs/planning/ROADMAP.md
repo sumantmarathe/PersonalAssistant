@@ -2,14 +2,13 @@
 
 **Product**: Personal Assistant Suite  
 **Customer**: Sumant Marathe  
-**Architecture Model**: Privacy-First, Zero-Knowledge, Local-First (No Central Cloud Database)  
-**Governance Framework**: V-Cycle Engineering Model (ISO 26262 / DO-178C Inspired)
+**Architecture Model**: Privacy-First, Zero-Knowledge, Local-First with User-Owned Cloud Sync  
+**Governance Framework**: V-Cycle Engineering Model (ISO 26262 / DO-178C Inspired)  
+**Branching Model**: Production Release on `main`; Active Development on Side Branches (`feat/*`)  
 
 ---
 
 ## Portfolio Strategy
-
-The Personal Assistant application is transitioning from a standalone Todo page into an extensible, modular personal dashboard containing self-contained sub-applications.
 
 ```
 +-----------------------------------------------------------+
@@ -21,7 +20,7 @@ The Personal Assistant application is transitioning from a standalone Todo page 
 +-----------------------+       +-----------------------+
 |  Sub-App 1: Budget    |       |  Sub-App 2: Future    |
 |  & Expense Planner    |       |  Notes / Assistant    |
-|  (Current Sprint 1)   |       |  (Upcoming)           |
+|  (Local + GDrive Sync)|       |  (Upcoming)           |
 +-----------------------+       +-----------------------+
 ```
 
@@ -31,6 +30,7 @@ The Personal Assistant application is transitioning from a standalone Todo page 
 
 | Sprint | Objective | Status | Key Deliverables |
 | :--- | :--- | :--- | :--- |
-| **Sprint 1** | **Budget & Expense Planner MVP** | 🟢 **In Progress** | Multi-app portal frame, Income/Expense tracking, balance ledger, 100% local persistence (IndexedDB), encrypted JSON export/import backup for PC/Mobile, full V-Cycle test & audit sign-off. |
-| **Sprint 2** | **Budget Analytics & Category Visuals** | ⚪ Queued | Breakdown charts, monthly budget caps, spending alerts, CSV export. |
-| **Sprint 3** | **Next Modular Sub-App** | ⚪ Queued | Customer priority selection (e.g., Secure Notes, Habit Tracker). |
+| **Sprint 1** | **Budget & Expense Planner MVP** | 🟢 **DELIVERED** | Multi-app portal frame, Income/Expense tracking, balance ledger, 100% local persistence (IndexedDB), encrypted JSON export/import backup for PC/Mobile, full V-Cycle test & audit sign-off. |
+| **Sprint 2** | **Google Sign-In & Google Drive Sync** | 🟢 **IN PROGRESS** | OAuth 2.0 Google Identity Services, user-owned Google Drive backup/restore (`drive.appdata` / `drive.file`), cross-device automated sync without any intermediate server. |
+| **Sprint 3** | **Budget Analytics & Category Visuals** | ⚪ Queued | Breakdown charts, monthly budget caps, spending alerts, CSV export. |
+| **Sprint 4** | **Next Modular Sub-App** | ⚪ Queued | Customer priority selection (e.g., Secure Notes, Habit Tracker). |
