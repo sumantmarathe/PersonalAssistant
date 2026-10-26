@@ -30,21 +30,29 @@ This repository operates under a **Mission-Critical Multi-Agent Governance Model
 
 ---
 
-## Git Branching & Deployment Policy
+## Git Branching & Dual-Target Deployment Policy
 
-Strict separation between development and delivery:
+Strict separation between development and delivery, governing both **Web Application** and **Native Android Application** targets:
 
 1. **`main` Branch (Production Delivery Only)**:
    - Houses only certified, customer-facing releases.
-   - Deploys live automatically to GitHub Pages: `https://sumantmarathe.github.io/PersonalAssistant/`.
-   - **Rule**: Direct development or untested commits on `main` are strictly forbidden. Only merged when Gate 5 (L2 Audit Clearance) is signed.
+   - **Dual Production Releases**:
+     - **Web Deployment**: Deploys live automatically to GitHub Pages: `https://sumantmarathe.github.io/PersonalAssistant/`.
+     - **Android Release**: Builds and packages the production Android APK (`personal-assistant-release.apk`).
+   - **Rule**: Direct development or untested commits on `main` are strictly forbidden. Only merged when Gate 5 (L2 Audit Clearance) certifies BOTH Web and Android targets.
 2. **`feat/<task-id>-<name>` Branches (Feature Development)**:
    - Created by the Lead Developer for every sprint task.
-   - Implementation, unit tests, and integration tests execute on this side branch.
+   - Implementation, unit tests, Android wrapper logic, and integration tests execute on this side branch.
 3. **`fix/<issue-id>-<name>` Branches (Bug & Defect Remediation)**:
    - Dedicated side branches to reproduce, patch, and re-verify defects without risking production stability.
-4. **Merge Clearance**:
-   - Merging from side branch to `main` requires: 100% unit & integration test passes, browser QA validation, L1 Review sign-off, and L2 Principal Audit certification.
+4. **Merge Clearance (Dual-Target Verification)**:
+   - Merging from side branch to `main` requires:
+     - 100% unit tests passing across web logic and Android bridge components.
+     - 100% integration tests passing (storage persistence and cloud sync).
+     - Live browser QA validation (`browser_subagent`) with video and screenshot evidence.
+     - Android device/emulator QA validation (`android` CLI / `adb` / layout / screen inspection) with screenshot evidence.
+     - L1 Review sign-off and L2 Principal Audit certification covering both targets.
+
 
 ---
 
@@ -82,18 +90,19 @@ When the Customer triggers a process audit:
 
 ---
 
-## Governance Gates & Lifecycle
+## Governance Gates & Lifecycle (Dual-Target Pipeline)
 
-| Gate | Name | Mandatory Deliverables | Approver |
+| Gate | Name | Mandatory Deliverables (Web + Android App) | Approver |
 | :--- | :--- | :--- | :--- |
-| **Gate 0** | **Requirements & DoR** | User Story, Gherkin Scenarios, ACs, DoR verified | Tech Lead & Customer |
-| **Gate 1** | **Architecture & Pre-Flight** | Mermaid Diagrams, Schema Specs, **External Dependency & Credential Pre-Flight** | Tech Lead |
-| **Gate 2** | **Implementation** | Side feature branch (`feat/*`), clean code adhering to design | Lead Developer |
-| **Gate 3** | **Verification Suite** | Unit tests + Integration tests + E2E browser recording | QA & Test Engineers |
-| **Gate 4** | **L1 Technical Audit** | Discrepancy report, RTM 100% check (`docs/audits/L1.md`) | L1 Reviewer |
-| **Gate 5** | **L2 Meta-Audit** | Review methodology certification (`docs/audits/L2.md`) | L2 Auditor |
-| **Gate 6** | **Customer Delivery** | Fast-forward merge to `main`, Live GitHub Pages deploy | Tech Lead & Customer |
-| **Audit Gate** | **Customer Process Audit** | NCR log, CAPA verification, executive clearance (`docs/audits/PROCESS-AUDIT-*.md`) | Process Auditor & Customer |
+| **Gate 0** | **Requirements & DoR** | User Story, Gherkin Scenarios, ACs covering Web & Android App, DoR verified | Tech Lead & Customer |
+| **Gate 1** | **Architecture & Pre-Flight** | Web architecture, Android wrapper design (`android/`), DOM storage spec, External Dependency Pre-Flight | Tech Lead |
+| **Gate 2** | **Implementation** | Side feature branch (`feat/*`), Web code + Android project, clean builds | Lead Developer |
+| **Gate 3** | **Verification Suite** | Unit tests + Integration tests + Browser E2E recording + Android Emulator/Device E2E screenshots | QA & Test Engineers |
+| **Gate 4** | **L1 Technical Audit** | Discrepancy report, Dual-target RTM 100% check (`docs/audits/L1.md`) | L1 Reviewer |
+| **Gate 5** | **L2 Meta-Audit** | Dual-release review certification (Web deploy + Android APK artifact) | L2 Auditor |
+| **Gate 6** | **Customer Delivery** | Merge to `main`, Live GitHub Pages deploy, APK artifact build & release notes | Tech Lead & Customer |
+| **Audit Gate** | **Customer Process Audit** | Dual-target compliance audit, NCR log, CAPA verification (`docs/audits/PROCESS-AUDIT-*.md`) | Process Auditor & Customer |
+
 
 ---
 

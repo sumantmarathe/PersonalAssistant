@@ -30,7 +30,9 @@
 
 | Sprint | Objective | Status | Key Deliverables |
 | :--- | :--- | :--- | :--- |
-| **Sprint 1** | **Budget & Expense Planner MVP** | 🟢 **DELIVERED** | Multi-app portal frame, Income/Expense tracking, balance ledger, 100% local persistence (IndexedDB), encrypted JSON export/import backup for PC/Mobile, full V-Cycle test & audit sign-off. |
-| **Sprint 2** | **Google Sign-In & Google Drive Sync** | 🟢 **IN PROGRESS** | OAuth 2.0 Google Identity Services, user-owned Google Drive backup/restore (`drive.appdata` / `drive.file`), cross-device automated sync without any intermediate server. |
-| **Sprint 3** | **Budget Analytics & Category Visuals** | ⚪ Queued | Breakdown charts, monthly budget caps, spending alerts, CSV export. |
-| **Sprint 4** | **Next Modular Sub-App** | ⚪ Queued | Customer priority selection (e.g., Secure Notes, Habit Tracker). |
+| **Sprint 1** | **Budget & Expense Planner MVP** | 🟢 **DELIVERED (v1.0.0)** | Multi-app portal frame, Income/Expense tracking, balance ledger, 100% local persistence (IndexedDB), JSON export/import backup for PC/Mobile, full V-Cycle test & audit sign-off. |
+| **Sprint 2** | **Google Sign-In & Google Drive Sync** | 🟢 **DELIVERED (v1.1.0)** | OAuth 2.0 Google Identity Services, user-owned Google Drive cloud backup/sync (`drive.file`), cross-device automated sync, INR currency standard, full QMS process audit certification. |
+| **Sprint 3** | **Android App & Dual-Target Release Pipeline** | 🟡 **PLANNED / INITIATING (v1.2.0)** | Native Android Application container (`.apk`), full offline/IndexedDB parity, direct app launch without browser URL navigation, Dual-Target Release & Test Pipeline (simultaneous GitHub Pages & APK builds and automated tests). |
+| **Sprint 4** | **Budget Analytics & Category Visuals** | ⚪ Queued | Breakdown charts, monthly budget caps, spending alerts, CSV export. |
+| **Sprint 5** | **Next Modular Sub-App** | ⚪ Queued | Customer priority selection (e.g., Secure Notes, Habit Tracker). |
+
