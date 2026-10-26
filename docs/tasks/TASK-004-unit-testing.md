@@ -1,0 +1,17 @@
+# [TASK-004] Unit Test Engineering & Math Verification
+
+**Sprint**: Sprint 01  
+**Assignee**: **Unit Test Engineer**  
+**Reviewer**: **L1 Technical Reviewer**  
+**Gate**: Gate 3 (Verification Suite)  
+**Status**: ⚪ Pending Gate 2  
+
+---
+
+## 1. Objective
+Write and execute automated unit tests covering mathematical calculations (balance, income sums, expense sums), input validation, negative values, date formatting, and backup data schema validation.
+
+## 2. Deliverables
+- [ ] Unit test suite in `tests/unit/`.
+- [ ] Automated test runner configuration.
+- [ ] 100% test pass rate execution log (`tests/reports/unit-test-report.md`).
