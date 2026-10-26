@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Personal Assistant • Budget & Expense Planner</title>
+  <link rel="stylesheet" href="css/style.css">
+  <meta name="description" content="Privacy-first, zero-knowledge personal finance and budget planner. Stores 100% locally on your device with no external server tracking.">
+</head>
+<body>
+
+  <!-- Master Application Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-icon">🛡️</div>
+        <div>
+          <h1 class="brand-title">Personal Assistant</h1>
+          <span class="brand-badge">🔒 100% Local & Private</span>
+        </div>
+      </div>
+
+      <!-- Modular Sub-App Switcher -->
+      <nav class="app-nav" aria-label="Application Modules">
+        <button class="nav-tab active" data-app="budget">
+          <span>💰</span> Budget Planner
+        </button>
+        <button class="nav-tab" data-app="notes" title="Coming in future sprint">
+          <span>📝</span> Notes
+        </button>
+        <button class="nav-tab" data-app="assistant" title="Coming in future sprint">
+          <span>⚡</span> Assistant
+        </button>
+      </nav>
+
+      <!-- Data Portability Controls (Cross-Device JSON Backup) -->
+      <div class="header-actions">
+        <input type="file" id="import-file-input" accept=".json,application/json" style="display: none;">
+        <button id="btn-import-trigger" class="btn-secondary" title="Restore transactions from a local JSON backup file">
+          <span>📥</span> Import
+        </button>
+        <button id="btn-export-backup" class="btn-secondary" title="Download encrypted/structured JSON backup for PC or Mobile">
+          <span>💾</span> Backup
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Work Area Container -->
+  <main class="main-wrapper" id="main-portal-view">
+
+    <!-- Privacy Assurance Callout -->
+    <div class="privacy-banner">
+      <span>🛡️</span>
+      <div>
+        <strong>Zero-Knowledge Privacy:</strong> All entries are stored exclusively inside your browser's persistent IndexedDB. No financial records ever touch a remote server.
+      </div>
+    </div>
+
+    <!-- Financial Metric Summary Cards -->
+    <section class="metrics-grid" aria-label="Financial Summary Cards">
+      <div class="metric-card balance">
+        <div class="metric-header">
+          <span class="metric-label">Net Balance</span>
+          <div class="metric-icon">💳</div>
+        </div>
+        <div class="metric-value" id="metric-net-balance">$0.00</div>
+      </div>
+
+      <div class="metric-card income">
+        <div class="metric-header">
+          <span class="metric-label">Total Income</span>
+          <div class="metric-icon">📈</div>
+        </div>
+        <div class="metric-value" id="metric-total-income">$0.00</div>
+      </div>
+
+      <div class="metric-card expense">
+        <div class="metric-header">
+          <span class="metric-label">Total Expenses</span>
+          <div class="metric-icon">📉</div>
+        </div>
+        <div class="metric-value" id="metric-total-expense">$0.00</div>
+      </div>
+    </section>
+
+    <!-- Sub-App Content Grid: Form + Ledger -->
+    <div class="app-content-grid">
+
+      <!-- Left Column: Transaction Input Form -->
+      <aside class="panel">
+        <h2 class="panel-title"><span>✍️</span> Record Transaction</h2>
+
+        <!-- Type Selector: Expense vs Income -->
+        <div class="type-toggle-group">
+          <button type="button" class="type-toggle-btn active expense" data-type="expense">
+            <span>📉</span> Expense
+          </button>
+          <button type="button" class="type-toggle-btn income" data-type="income">
+            <span>📈</span> Income
+          </button>
+        </div>
+
+        <form id="transaction-form" autocomplete="off">
+          <div class="form-group">
+            <label class="form-label" for="tx-amount">Amount ($)</label>
+            <input type="number" step="0.01" min="0.01" id="tx-amount" class="input-control" placeholder="0.00" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="tx-category">Category</label>
+            <select id="tx-category" class="input-control" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="tx-date">Date</label>
+            <input type="date" id="tx-date" class="input-control" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="tx-description">Note / Description (Optional)</label>
+            <input type="text" id="tx-description" class="input-control" placeholder="e.g. Trader Joe's groceries, salary bonus">
+          </div>
+
+          <button type="submit" id="btn-submit-tx" class="btn-submit">
+            <span>+ Add Expense</span>
+          </button>
+        </form>
+      </aside>
+
+      <!-- Right Column: Ledger & Search Filters -->
+      <section class="panel">
+        <div class="ledger-header">
+          <h2 class="panel-title" style="margin-bottom: 0;"><span>📜</span> Transaction Ledger</h2>
+
+          <!-- Filters -->
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="income">Incomes</button>
+            <button class="filter-btn" data-filter="expense">Expenses</button>
+          </div>
+
+          <!-- Search -->
+          <input type="text" id="search-input" class="input-control search-input" placeholder="🔍 Search records...">
+        </div>
+
+        <!-- Scrollable List of Records -->
+        <div class="transaction-list" id="transaction-list">
+          <!-- Dynamically populated by budgetApp.js -->
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Script Modules -->
+  <script src="js/storage.js"></script>
+  <script src="js/budgetApp.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
