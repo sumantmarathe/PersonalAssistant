@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Personal Assistant • Budget & Expense Planner</title>
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
   <link rel="stylesheet" href="css/style.css">
   <meta name="description" content="Privacy-first, zero-knowledge personal finance and budget planner. Sign in with Google for seamless cross-device synchronization.">
 </head>
@@ -35,6 +41,11 @@
 
       <!-- Consumer-Grade Google Sign-In & User Identity -->
       <div class="header-actions">
+        <!-- PWA Install Action Button (shown when installable) -->
+        <button id="btn-install-pwa" class="btn-install-pwa" style="display: none;" title="Install Personal Assistant as an app on your mobile device">
+          <span>📲</span> Install App
+        </button>
+
         <!-- Signed-Out View: Single Google Sign-In Button -->
         <div id="auth-signed-out" class="auth-wrapper">
           <button id="btn-google-signin" class="btn-google" title="Sign in with your Google account for automatic cross-device sync">

@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented in this file following the Keep a Changelog standard.
 
+## [v1.3.0] - 2026-10-26 (Sprint 04 Delivery)
+
+### Added
+- **Progressive Web App (PWA) Mobile Installation**:
+  - W3C Web App Manifest (`manifest.json`) enabling direct home-screen installation on mobile Chrome and iOS Safari without sideloading raw `.apk` packages (complying with enterprise MDM security policies).
+  - Standalone immersive display mode without browser navigation or URL bars.
+  - High-resolution adaptive PNG icons (`192x192`, `512x512`, maskable).
+  - Elegant in-app "📲 Install App" prompt button in header dock listening to `beforeinstallprompt`.
+- **Service Worker Offline Caching (`sw.js`)**:
+  - Cache-first strategy for application shell assets (`index.html`, `style.css`, scripts, manifest, icons) under cache namespace `personal-assistant-v1.3.0`.
+  - Offline fallback to application shell for offline launches.
+  - Safe bypass for Google Identity Services and Google Drive cloud sync API traffic.
+- **Dual-Target Asset Synchronization**:
+  - `scripts/build-android.mjs` updated to automatically stage PWA manifest, service worker, and icons into native Android container assets.
+  - Standalone Android APK verified and recompiled (11.39 MB).
+- **Quality Assurance**:
+  - 6 new automated tests (4 unit tests in `pwa_manifest_sw.test.mjs`, 2 integration tests in `pwa_offline.test.mjs`).
+  - Total automated test suite expanded to 33/33 passing tests (0 failures).
+
 ---
 
 ## [v1.2.0] - 2026-10-26 (Sprint 03 Delivery)

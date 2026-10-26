@@ -43,10 +43,23 @@
 
 ---
 
+---
+
+## Sprint 04 Scope (PWA Mobile Installation & Offline Mode v1.3.0)
+| Req ID | Customer Need | Description | Design Spec | Implementation | Unit Test | Integration / E2E Test | L1 Sign-off | L2 Sign-off |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **REQ-019** | CN-06 | W3C Web App Manifest Specification | `SPEC-004#S2.1` | `manifest.json`, `icons/` | `pwa_manifest_sw.test.mjs` | Browser QA Discovery | 🟢 Approved | 🟢 Certified |
+| **REQ-020** | CN-06 | Service Worker & Offline Caching Engine | `SPEC-004#S2.2` | `sw.js` | `pwa_manifest_sw.test.mjs` | `pwa_offline.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-021** | CN-06 | In-App Install Prompt User Experience | `SPEC-004#S2.3` | `index.html`, `js/app.js` | `pwa_manifest_sw.test.mjs` | Browser Subagent QA | 🟢 Approved | 🟢 Certified |
+| **REQ-022** | CN-06 | Dual-Target Release & Asset Synchronization Parity | `SPEC-004#S3` | `scripts/build-android.mjs` | `pwa_manifest_sw.test.mjs` | `build-android.mjs` Execution | 🟢 Approved | 🟢 Certified |
+
+---
+
 ## Task & Process Audit Traceability
 - **Sprint 01 Tasks**: `docs/tasks/TASK-001` through `TASK-008` (All 🟢 Certified).
 - **Sprint 02 Tasks**: `docs/tasks/TASK-009` through `TASK-016` (All 🟢 Certified).
-- **Sprint 03 Tasks**: `docs/tasks/TASK-017` through `TASK-024` (🟡 Active in `feat/sprint-03-android-app`).
-- **Process Compliance Audit**: `docs/audits/PROCESS-AUDIT-01.md` (Triggered by Customer; All NCRs verified & closed).
+- **Sprint 03 Tasks**: `docs/tasks/TASK-017` through `TASK-024` (All 🟢 Certified).
+- **Sprint 04 Tasks**: `docs/tasks/TASK-025` through `TASK-032` (All 🟢 Certified).
+- **Process Compliance Audits**: `docs/audits/PROCESS-AUDIT-01.md` and `docs/audits/PROCESS-AUDIT-02.md` (All NCRs verified & closed).
 
 
