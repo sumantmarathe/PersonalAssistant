@@ -4,26 +4,28 @@ This repository operates under a **Mission-Critical Multi-Agent Governance Model
 
 ```
                          [Customer (You)]
-                                |
-                   [Tech Lead / Customer Liaison]
-                                |
-               +----------------+----------------+
-               |                                 |
-     [Scrum Master / Reporting]         [V-Cycle Engineering Core]
-                                                 |
-                                     +-----------+-----------+
-                                     |                       |
-                             [Left-V: Design]        [Right-V: Verification]
-                             - Requirements          - Unit Testing
-                             - Architecture          - Integration Testing
-                                     \                       /
-                                      +-- [Developer Core] -+
-                                                 |
-                                        [L1 Tech Reviewer]
-                                                 |
-                                        [L2 Principal Auditor]
-                                                 |
-                                      [Customer Sign-off Gate]
+                            |         \
+                            |          +--- [Direct Audit Trigger]
+                            |                     |
+               [Tech Lead / Customer Liaison]     v
+                            |           [Process / QMS Compliance Auditor]
+             +--------------+---------------+     | (Findings / NCRs)
+             |                              |     v
+   [Scrum Master / Reporting]     [V-Cycle Core] [Tech Lead Remediation]
+                                            |      | (CAPA / Re-Audit)
+                                +-----------+      v
+                                |              [Re-Audit Verified]
+                        [Left-V: Design]           |
+                        - Requirements             v
+                        - Architecture      [Executive Report to Customer]
+                                \       
+                                 +-- [Developer Core] --+
+                                            |
+                                   [L1 Tech Reviewer]
+                                            |
+                                   [L2 Principal Auditor]
+                                            |
+                                 [Customer Sign-off Gate]
 ```
 
 ---
@@ -64,6 +66,19 @@ Strict separation between development and delivery:
 ### 3. Independent Oversight & Verification (IV&V)
 - **L1 Technical Reviewer**: Independent code, test, and specification auditor. Cross-references code and test cases against the Requirements Traceability Matrix (RTM).
 - **L2 Principal Auditor (Reviewer of Reviewer)**: Audits the L1 review for thoroughness, checks security and architecture compliance, and issues the formal Release Gate Clearance.
+- **Process / QMS Compliance Auditor**: An independent quality assurance role triggered directly by the **Customer**. Audits adherence to engineering process, task tracking, branch hygiene, external dependency governance, and failure-mode analysis. Delivers reports to Tech Lead for corrective action, re-audits until resolution, and certifies completion to the Customer.
+
+---
+
+## Customer-Triggered Process Audit Protocol
+
+When the Customer triggers a process audit:
+1. **Trigger**: Customer invokes the Process Auditor directly.
+2. **Audit & NCR Dispatch**: Process Auditor audits the repository, commits, task trackers, and engineering practices, raising Non-Conformance Reports (NCRs) in `docs/audits/PROCESS-AUDIT-*.md`.
+3. **Findings Handoff to Tech Lead**: Auditor presents the detailed report directly to the Tech Lead.
+4. **Tech Lead CAPA**: Tech Lead executes Corrective & Preventive Actions (CAPA) to resolve all root causes and gaps.
+5. **Re-Audit**: Auditor verifies resolution. If any finding is unresolved, cycle repeats.
+6. **Executive Clearance to Customer**: Auditor provides a high-level summary report directly to the Customer.
 
 ---
 
@@ -72,9 +87,31 @@ Strict separation between development and delivery:
 | Gate | Name | Mandatory Deliverables | Approver |
 | :--- | :--- | :--- | :--- |
 | **Gate 0** | **Requirements & DoR** | User Story, Gherkin Scenarios, ACs, DoR verified | Tech Lead & Customer |
-| **Gate 1** | **Architecture Design** | Mermaid Diagrams, Schema Specifications (`docs/design/`) | Tech Lead |
+| **Gate 1** | **Architecture & Pre-Flight** | Mermaid Diagrams, Schema Specs, **External Dependency & Credential Pre-Flight** | Tech Lead |
 | **Gate 2** | **Implementation** | Side feature branch (`feat/*`), clean code adhering to design | Lead Developer |
 | **Gate 3** | **Verification Suite** | Unit tests + Integration tests + E2E browser recording | QA & Test Engineers |
 | **Gate 4** | **L1 Technical Audit** | Discrepancy report, RTM 100% check (`docs/audits/L1.md`) | L1 Reviewer |
 | **Gate 5** | **L2 Meta-Audit** | Review methodology certification (`docs/audits/L2.md`) | L2 Auditor |
 | **Gate 6** | **Customer Delivery** | Fast-forward merge to `main`, Live GitHub Pages deploy | Tech Lead & Customer |
+| **Audit Gate** | **Customer Process Audit** | NCR log, CAPA verification, executive clearance (`docs/audits/PROCESS-AUDIT-*.md`) | Process Auditor & Customer |
+
+---
+
+## Gate 1 Pre-Flight External Dependency & Credentials Protocol
+
+To prevent late-stage delivery failures caused by missing third-party credentials or disabled cloud services:
+1. **Identification**: During Gate 1 (Architecture), the System Architect must identify every external API, OAuth Client ID, third-party service, and cloud dependency.
+2. **Customer Proactive Elicitation**: The Tech Lead **MUST** proactively request real production/sandbox credentials from the Customer during Gate 1. Under no circumstances should engineering proceed into Gate 2 (Implementation) with dummy or mock credentials without explicitly asking the Customer.
+3. **Environment Prerequisite Checklist**: The System Architect must specify all cloud console setup requirements (e.g., enabling specific APIs like Google Drive API, configuring Authorized JavaScript Origins, setting Test Users) before Gate 2 entry.
+
+---
+
+## Hotfix & Patch Management Protocol (`fix/*`)
+
+Any bug fix, patch, or post-release correction must follow the branch isolation policy:
+1. Create a dedicated branch: `fix/<issue-id>-<description>`.
+2. Implement and verify unit and integration tests.
+3. Run L1 review verification.
+4. Merge to `main` via PR / fast-forward merge and push to deployment (`gh-pages`). Direct unverified commits to `main` are strictly prohibited.
+
+

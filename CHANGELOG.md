@@ -16,11 +16,16 @@ All notable changes to this project are documented in this file following the Ke
   - Least-privilege scope (`https://www.googleapis.com/auth/drive.file`) ensuring zero access to other Drive files.
 - **Custom OAuth Client ID Configuration**:
   - Added Settings modal (⚙️ gear icon) allowing users to configure custom Google OAuth 2.0 Web Client IDs.
+- **Currency Localization**:
+  - Configured Indian Rupee (`₹` / INR) as the standard default currency across metrics, ledger entries, and input forms.
+- **Enhanced Cloud Error Diagnosis**:
+  - Deterministic discrimination of Google Drive API error reasons (`storageQuotaExceeded` vs `accessNotConfigured`).
+  - Added dedicated user alerts when Google Drive API requires project-level activation in Google Cloud Console.
 - **V-Cycle Test & Governance Suite**:
   - 6 new automated unit tests (`17/17` total passing).
   - Cross-device sync integration test verifying PC-to-Mobile rehydration (`4/4` total passing).
   - Browser E2E validation recording artifact.
-  - L1 Technical Review and L2 Principal Meta-Audit certifications.
+  - L1 Technical Review, L2 Principal Meta-Audit certifications, and Process Compliance Audit report.
 
 ---
 

@@ -29,3 +29,11 @@
 | **REQ-011** | CN-05 | Sync to Drive (Cloud Backup) | `SPEC-002#S4` | `js/googleDriveService.js#L143` | `drive_sync_persistence.test.mjs` (TC-1) | `qa-e2e-report-sprint-02.md` | 🟢 Approved | 🟢 Certified |
 | **REQ-012** | CN-05 | Restore from Drive (Cloud Import) | `SPEC-002#S4` | `js/googleDriveService.js#L206` | `drive_sync_persistence.test.mjs` (TC-1) | `qa-e2e-report-sprint-02.md` | 🟢 Approved | 🟢 Certified |
 | **REQ-013** | CN-05 | Disconnect & Session Termination | `SPEC-002#S6` | `js/googleDriveService.js#L125` | `google_drive_sync.test.mjs` (TC-6) | `qa-e2e-report-sprint-02.md` | 🟢 Approved | 🟢 Certified |
+
+---
+
+## Task & Process Audit Traceability
+- **Sprint 01 Tasks**: `docs/tasks/TASK-001` through `TASK-008` (All 🟢 Certified).
+- **Sprint 02 Tasks**: `docs/tasks/TASK-009` through `TASK-016` (All 🟢 Certified).
+- **Process Compliance Audit**: `docs/audits/PROCESS-AUDIT-01.md` (Triggered by Customer; All NCRs verified & closed).
+

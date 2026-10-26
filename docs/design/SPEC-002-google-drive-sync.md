@@ -96,6 +96,13 @@ interface IGoogleDriveService {
 4. **File Download**:
    - `GET https://www.googleapis.com/drive/v3/files/{fileId}?alt=media`
 
+### 4.1 Deterministic Error Diagnosis & Failure Modes
+When the Google Drive API returns an HTTP 4xx/5xx status code, the service must parse the specific `error.errors[0].reason` field rather than generic HTTP status codes:
+- `storageQuotaExceeded`: User's Google Drive has exhausted its byte quota. Notify UI with status `'quota_exceeded'`.
+- `accessNotConfigured` or message mentioning disabled Drive API: The Google Drive API is not activated in Google Cloud Console. Notify UI with status `'drive_api_disabled'`.
+- Any other error: Surface sanitized message or status code without false assumptions.
+
+
 ---
 
 ## 5. Gate 1 Sign-Off

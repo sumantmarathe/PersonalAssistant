@@ -49,14 +49,14 @@ The Budget & Expense Planner is a privacy-first, client-side personal finance to
   ```
 
 ### `REQ-004`: Financial Summary Metrics
-- **Description**: The UI must display real-time summary cards for **Net Balance**, **Total Income**, and **Total Expenses**, formatted cleanly with currency symbols.
+- **Description**: The UI must display real-time summary cards for **Net Balance**, **Total Income**, and **Total Expenses**, formatted cleanly with the Indian Rupee (INR `₹`) currency symbol.
 - **Gherkin**:
   ```gherkin
   Scenario: Dynamic financial balance calculation
     Given the user has total incomes of 5000.00 and total expenses of 1200.00
-    Then the Net Balance card displays "+$3,800.00"
-    And the Total Income card displays "$5,000.00"
-    And the Total Expenses card displays "$1,200.00"
+    Then the Net Balance card displays "+₹3,800.00"
+    And the Total Income card displays "₹5,000.00"
+    And the Total Expenses card displays "₹1,200.00"
   ```
 
 ### `REQ-005`: Ledger Filtering & Search
