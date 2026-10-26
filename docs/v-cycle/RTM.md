@@ -55,11 +55,24 @@
 
 ---
 
+## Sprint 05 Scope (Bank Statement Importer PDF & CSV v1.4.0)
+| Req ID | Customer Need | Description | Design Spec | Implementation | Unit Test | Integration / E2E Test | L1 Sign-off | L2 Sign-off |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **REQ-023** | CN-07 | Zero-Knowledge Client-Side File Ingestion | `SPEC-005#S2.1` | `FileReader`, `statementParser.js` | `statement_parser.test.mjs` | Browser QA File Ingestion | 🟢 Approved | 🟢 Certified |
+| **REQ-024** | CN-07 | PDF Statement Text Extraction Engine | `SPEC-005#S2.3` | `js/vendor/pdf.min.js`, `parsePDF` | `statement_parser.test.mjs` | `statement_import_flow.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-025** | CN-07 | CSV Bank Statement Tabular Parsing Engine | `SPEC-005#S2.2` | `parseCSV` in `statementParser.js` | `statement_parser.test.mjs` | `statement_import_flow.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-026** | CN-07 | Bank Statement Preset Heuristics & Normalization | `SPEC-005#S2.4` | Presets (HDFC, SBI, ICICI, Axis) | `statement_parser.test.mjs` | `statement_import_flow.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-027** | CN-07 | Interactive Review, Mapping & Batch Commit Modal | `SPEC-005#S2.6` | `index.html`, `budgetApp.js` | `statement_parser.test.mjs` | Browser Subagent Modal QA | 🟢 Approved | 🟢 Certified |
+| **REQ-028** | CN-07 | Duplicate Transaction Detection Safeguard | `SPEC-005#S2.6` | `flagDuplicates` in `statementParser.js` | `statement_parser.test.mjs` | `statement_import_flow.test.mjs` | 🟢 Approved | 🟢 Certified |
+
+---
+
 ## Task & Process Audit Traceability
 - **Sprint 01 Tasks**: `docs/tasks/TASK-001` through `TASK-008` (All 🟢 Certified).
 - **Sprint 02 Tasks**: `docs/tasks/TASK-009` through `TASK-016` (All 🟢 Certified).
 - **Sprint 03 Tasks**: `docs/tasks/TASK-017` through `TASK-024` (All 🟢 Certified).
 - **Sprint 04 Tasks**: `docs/tasks/TASK-025` through `TASK-032` (All 🟢 Certified).
-- **Process Compliance Audits**: `docs/audits/PROCESS-AUDIT-01.md` and `docs/audits/PROCESS-AUDIT-02.md` (All NCRs verified & closed).
+- **Sprint 05 Tasks**: `docs/tasks/TASK-033` through `TASK-040` (All 🟢 Certified).
+- **Process Compliance Audits**: `docs/audits/PROCESS-AUDIT-01.md`, `PROCESS-AUDIT-02.md`, and `PROCESS-AUDIT-03.md` (All NCRs verified & closed).
 
 

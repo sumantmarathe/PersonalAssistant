@@ -122,6 +122,55 @@ class StorageService {
   }
 
   /**
+   * Adds multiple transactions to the database in a batch
+   * @param {Array<Object>} transactions
+   * @returns {Promise<Array<Object>>}
+   */
+  async batchAddTransactions(transactions) {
+    if (!transactions || transactions.length === 0) return [];
+
+    const prepared = transactions.map((t) => {
+      const copy = { ...t };
+      if (!copy.id) {
+        copy.id = 'tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+      }
+      if (!copy.createdAt) {
+        copy.createdAt = Date.now();
+      }
+      return copy;
+    });
+
+    if (this.db) {
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction([this.storeName], 'readwrite');
+          const store = tx.objectStore(this.storeName);
+          for (const item of prepared) {
+            store.put(item);
+          }
+          tx.oncomplete = () => resolve(prepared);
+          tx.onerror = () => {
+            for (const item of prepared) {
+              this._saveLocalStorageFallback(item);
+            }
+            resolve(prepared);
+          };
+        } catch (e) {
+          for (const item of prepared) {
+            this._saveLocalStorageFallback(item);
+          }
+          resolve(prepared);
+        }
+      });
+    }
+
+    for (const item of prepared) {
+      this._saveLocalStorageFallback(item);
+    }
+    return prepared;
+  }
+
+  /**
    * Deletes a transaction by ID
    * @param {string} id
    */
