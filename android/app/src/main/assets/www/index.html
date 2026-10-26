@@ -153,6 +153,10 @@
           </button>
         </form>
 
+        <button id="btn-import-statement" class="btn-import-statement" title="Import transactions from a bank statement PDF or CSV">
+          <span>📄</span> Import Bank Statement (PDF / CSV)
+        </button>
+
         <!-- Secondary Local File Options -->
         <div class="local-backup-footer">
           <input type="file" id="import-file-input" accept=".json,application/json" style="display: none;">
@@ -191,8 +195,112 @@
     </div>
   </main>
 
+  <!-- Modal: Bank Statement Importer -->
+  <div id="modal-import-statement" class="modal-backdrop" style="display: none;">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">📄</span>
+          <div>
+            <h3 class="modal-title">Import Bank Statement</h3>
+            <p class="modal-subtitle">100% Client-Side & Private • Processed strictly in your browser</p>
+          </div>
+        </div>
+        <button id="btn-close-statement-modal" class="modal-close-btn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Step 1: Upload Zone -->
+        <div id="statement-upload-zone" class="upload-dropzone">
+          <input type="file" id="statement-file-input" accept=".csv,.pdf,text/csv,application/pdf" style="display: none;">
+          <div class="dropzone-content" id="dropzone-trigger">
+            <span class="dropzone-icon">📁</span>
+            <h4>Drag & Drop your Bank Statement here, or <span class="highlight">Browse</span></h4>
+            <p class="dropzone-hint">Supports PDF & CSV statements from HDFC, SBI, ICICI, Axis & Universal formats</p>
+          </div>
+        </div>
+
+        <!-- Step 2: Processing Spinner / Progress -->
+        <div id="statement-loading" class="statement-loading" style="display: none;">
+          <div class="spinner"></div>
+          <p id="statement-loading-text">Analyzing bank statement locally...</p>
+        </div>
+
+        <!-- Step 3: Interactive Review Table -->
+        <div id="statement-review-section" style="display: none;">
+          <div class="review-controls">
+            <div class="bank-preset-wrapper">
+              <label for="bank-preset-select">Bank Preset:</label>
+              <select id="bank-preset-select" class="input-control select-sm">
+                <option value="auto">Auto-Detect</option>
+                <option value="hdfc">HDFC Bank</option>
+                <option value="sbi">State Bank of India (SBI)</option>
+                <option value="icici">ICICI Bank</option>
+                <option value="axis">Axis Bank</option>
+                <option value="generic">Universal / Generic</option>
+              </select>
+            </div>
+            <div class="select-actions">
+              <button id="btn-select-all-stmt" class="btn-text-subtle">Select All</button>
+              <span>•</span>
+              <button id="btn-deselect-all-stmt" class="btn-text-subtle">Deselect All</button>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="statement-table-wrapper">
+            <table class="statement-table" id="statement-preview-table">
+              <thead>
+                <tr>
+                  <th width="40"><input type="checkbox" id="stmt-check-master" checked></th>
+                  <th width="110">Date</th>
+                  <th>Description</th>
+                  <th width="100">Type</th>
+                  <th width="140">Category</th>
+                  <th width="120" style="text-align: right;">Amount (₹)</th>
+                </tr>
+              </thead>
+              <tbody id="statement-preview-tbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Summary Metric Footer -->
+          <div class="statement-summary-bar">
+            <div class="summary-stat">
+              <span class="stat-label">Selected</span>
+              <span class="stat-value" id="stmt-count-selected">0 / 0</span>
+            </div>
+            <div class="summary-stat income">
+              <span class="stat-label">Total Income</span>
+              <span class="stat-value" id="stmt-total-income">+₹0.00</span>
+            </div>
+            <div class="summary-stat expense">
+              <span class="stat-label">Total Expense</span>
+              <span class="stat-value" id="stmt-total-expense">-₹0.00</span>
+            </div>
+            <div class="summary-stat net">
+              <span class="stat-label">Net Impact</span>
+              <span class="stat-value" id="stmt-net-impact">₹0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-cancel-statement" class="btn-secondary">Cancel</button>
+        <button id="btn-commit-statement" class="btn-submit" disabled>
+          <span>📥 Import Selected Entries</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Script Modules -->
+  <script src="js/vendor/pdf.min.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/statementParser.js"></script>
   <script src="js/googleDriveService.js"></script>
   <script src="js/budgetApp.js"></script>
   <script src="js/app.js"></script>

@@ -10,6 +10,7 @@ class BudgetApp {
     this.filterType = 'all';
     this.searchQuery = '';
     this.activeFormType = 'expense';
+    this.parsedStatementTransactions = [];
 
     this.categories = {
       expense: [
@@ -122,6 +123,305 @@ class BudgetApp {
     if (importBtn && importFileInput) {
       importBtn.addEventListener('click', () => importFileInput.click());
       importFileInput.addEventListener('change', (e) => this.handleImportBackup(e));
+    }
+
+    this.initStatementImporter();
+  }
+
+  initStatementImporter() {
+    const btnTrigger = document.getElementById('btn-import-statement');
+    const modal = document.getElementById('modal-import-statement');
+    const btnClose = document.getElementById('btn-close-statement-modal');
+    const btnCancel = document.getElementById('btn-cancel-statement');
+    const uploadZone = document.getElementById('statement-upload-zone');
+    const fileInput = document.getElementById('statement-file-input');
+    const masterCheck = document.getElementById('stmt-check-master');
+    const btnSelectAll = document.getElementById('btn-select-all-stmt');
+    const btnDeselectAll = document.getElementById('btn-deselect-all-stmt');
+    const btnCommit = document.getElementById('btn-commit-statement');
+
+    if (!btnTrigger || !modal) return;
+
+    const openModal = () => {
+      this.resetStatementModal();
+      modal.style.display = 'flex';
+    };
+
+    const closeModal = () => {
+      modal.style.display = 'none';
+      this.resetStatementModal();
+    };
+
+    btnTrigger.addEventListener('click', openModal);
+    if (btnClose) btnClose.addEventListener('click', closeModal);
+    if (btnCancel) btnCancel.addEventListener('click', closeModal);
+
+    // Click on dropzone opens file dialog
+    if (uploadZone && fileInput) {
+      uploadZone.addEventListener('click', () => fileInput.click());
+
+      // Drag and drop handlers
+      uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+      });
+
+      uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+      });
+
+      uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+          this.handleStatementFile(e.dataTransfer.files[0]);
+        }
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          this.handleStatementFile(e.target.files[0]);
+        }
+      });
+    }
+
+    // Master checkbox toggle
+    if (masterCheck) {
+      masterCheck.addEventListener('change', (e) => {
+        const isChecked = e.target.checked;
+        this.parsedStatementTransactions.forEach((t) => (t.selected = isChecked));
+        const rowChecks = document.querySelectorAll('.stmt-row-check');
+        rowChecks.forEach((cb) => (cb.checked = isChecked));
+        this.updateStatementSummary();
+      });
+    }
+
+    if (btnSelectAll) {
+      btnSelectAll.addEventListener('click', () => {
+        this.parsedStatementTransactions.forEach((t) => (t.selected = true));
+        if (masterCheck) masterCheck.checked = true;
+        document.querySelectorAll('.stmt-row-check').forEach((cb) => (cb.checked = true));
+        this.updateStatementSummary();
+      });
+    }
+
+    if (btnDeselectAll) {
+      btnDeselectAll.addEventListener('click', () => {
+        this.parsedStatementTransactions.forEach((t) => (t.selected = false));
+        if (masterCheck) masterCheck.checked = false;
+        document.querySelectorAll('.stmt-row-check').forEach((cb) => (cb.checked = false));
+        this.updateStatementSummary();
+      });
+    }
+
+    if (btnCommit) {
+      btnCommit.addEventListener('click', () => this.commitStatementImport());
+    }
+  }
+
+  resetStatementModal() {
+    this.parsedStatementTransactions = [];
+    const uploadZone = document.getElementById('statement-upload-zone');
+    const loadingSection = document.getElementById('statement-loading');
+    const reviewSection = document.getElementById('statement-review-section');
+    const fileInput = document.getElementById('statement-file-input');
+    const btnCommit = document.getElementById('btn-commit-statement');
+
+    if (uploadZone) uploadZone.style.display = 'block';
+    if (loadingSection) loadingSection.style.display = 'none';
+    if (reviewSection) reviewSection.style.display = 'none';
+    if (fileInput) fileInput.value = '';
+    if (btnCommit) {
+      btnCommit.disabled = true;
+      btnCommit.innerHTML = '<span>📥 Import Selected Entries</span>';
+    }
+  }
+
+  async handleStatementFile(file) {
+    if (!file) return;
+
+    const uploadZone = document.getElementById('statement-upload-zone');
+    const loadingSection = document.getElementById('statement-loading');
+    const loadingText = document.getElementById('statement-loading-text');
+
+    if (uploadZone) uploadZone.style.display = 'none';
+    if (loadingSection) loadingSection.style.display = 'block';
+    if (loadingText) loadingText.textContent = `Analyzing ${file.name} locally...`;
+
+    try {
+      let rawTransactions = [];
+      const isPdf = file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf';
+
+      if (isPdf) {
+        const arrayBuffer = await file.arrayBuffer();
+        rawTransactions = await window.statementParser.parsePDF(arrayBuffer);
+      } else {
+        const text = await file.text();
+        rawTransactions = window.statementParser.parseCSV(text);
+      }
+
+      if (!rawTransactions || rawTransactions.length === 0) {
+        this.showToast('No valid transactions found in the statement. Please check file format.', 'error');
+        this.resetStatementModal();
+        return;
+      }
+
+      // Check duplicates against active ledger
+      this.parsedStatementTransactions = window.statementParser.flagDuplicates(rawTransactions, this.transactions);
+      this.renderStatementPreview();
+    } catch (err) {
+      console.error('Statement parsing failed:', err);
+      this.showToast('Error reading bank statement: ' + (err.message || 'Corrupt or unreadable file'), 'error');
+      this.resetStatementModal();
+    }
+  }
+
+  renderStatementPreview() {
+    const loadingSection = document.getElementById('statement-loading');
+    const reviewSection = document.getElementById('statement-review-section');
+    const tbody = document.getElementById('statement-preview-tbody');
+    const btnCommit = document.getElementById('btn-commit-statement');
+
+    if (loadingSection) loadingSection.style.display = 'none';
+    if (reviewSection) reviewSection.style.display = 'block';
+    if (btnCommit) btnCommit.disabled = false;
+
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const allCategories = [
+      ...this.categories.expense,
+      ...this.categories.income,
+      'General'
+    ];
+    const uniqueCategories = Array.from(new Set(allCategories));
+
+    this.parsedStatementTransactions.forEach((tx, idx) => {
+      const tr = document.createElement('tr');
+      if (tx.isDuplicate) {
+        tr.className = 'is-duplicate';
+      }
+
+      const dupBadge = tx.isDuplicate ? '<span class="badge-duplicate">⚠️ Duplicate</span>' : '';
+      const typeClass = tx.type === 'income' ? 'income' : 'expense';
+
+      tr.innerHTML = `
+        <td><input type="checkbox" class="stmt-row-check" data-idx="${idx}" ${tx.selected ? 'checked' : ''}></td>
+        <td><code>${tx.date}</code></td>
+        <td>
+          <div style="font-weight: 500;">${this.escapeHtml(tx.description)}</div>
+          ${dupBadge}
+        </td>
+        <td>
+          <span class="table-type-badge ${typeClass}">${tx.type}</span>
+        </td>
+        <td>
+          <select class="table-select-cat" data-idx="${idx}">
+            ${uniqueCategories.map((cat) => `<option value="${cat}" ${cat.toLowerCase() === (tx.category || '').toLowerCase() ? 'selected' : ''}>${cat}</option>`).join('')}
+          </select>
+        </td>
+        <td style="text-align: right; font-weight: 600; color: ${tx.type === 'income' ? 'var(--accent-green)' : 'var(--text-primary)'};">
+          ${tx.type === 'income' ? '+' : '-'}₹${tx.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+        </td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+
+    // Wire row checkbox listeners
+    tbody.querySelectorAll('.stmt-row-check').forEach((cb) => {
+      cb.addEventListener('change', (e) => {
+        const idx = parseInt(e.target.dataset.idx, 10);
+        this.parsedStatementTransactions[idx].selected = e.target.checked;
+        this.updateStatementSummary();
+      });
+    });
+
+    // Wire category select listeners
+    tbody.querySelectorAll('.table-select-cat').forEach((sel) => {
+      sel.addEventListener('change', (e) => {
+        const idx = parseInt(e.target.dataset.idx, 10);
+        this.parsedStatementTransactions[idx].category = e.target.value;
+      });
+    });
+
+    this.updateStatementSummary();
+  }
+
+  updateStatementSummary() {
+    const countEl = document.getElementById('stmt-count-selected');
+    const incomeEl = document.getElementById('stmt-total-income');
+    const expenseEl = document.getElementById('stmt-total-expense');
+    const netEl = document.getElementById('stmt-net-impact');
+    const btnCommit = document.getElementById('btn-commit-statement');
+
+    const totalCount = this.parsedStatementTransactions.length;
+    const selected = this.parsedStatementTransactions.filter((t) => t.selected);
+
+    let totalIncome = 0;
+    let totalExpense = 0;
+
+    selected.forEach((t) => {
+      if (t.type === 'income') totalIncome += t.amount;
+      else totalExpense += t.amount;
+    });
+
+    const netImpact = totalIncome - totalExpense;
+
+    if (countEl) countEl.textContent = `${selected.length} / ${totalCount}`;
+    if (incomeEl) incomeEl.textContent = `+₹${totalIncome.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+    if (expenseEl) expenseEl.textContent = `-₹${totalExpense.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+    if (netEl) {
+      netEl.textContent = `${netImpact >= 0 ? '+' : '-'}₹${Math.abs(netImpact).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+      netEl.style.color = netImpact >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+    }
+
+    if (btnCommit) {
+      btnCommit.disabled = selected.length === 0;
+      btnCommit.innerHTML = `<span>📥 Import ${selected.length} Selected Entries</span>`;
+    }
+  }
+
+  async commitStatementImport() {
+    const selected = this.parsedStatementTransactions.filter((t) => t.selected);
+    if (selected.length === 0) return;
+
+    const btnCommit = document.getElementById('btn-commit-statement');
+    if (btnCommit) {
+      btnCommit.disabled = true;
+      btnCommit.textContent = 'Importing entries...';
+    }
+
+    try {
+      const toSave = selected.map((t) => ({
+        id: 'tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
+        type: t.type,
+        amount: t.amount,
+        category: t.category || 'General',
+        date: t.date,
+        description: t.description || 'Bank Statement Import',
+        createdAt: Date.now()
+      }));
+
+      await this.storage.batchAddTransactions(toSave);
+      await this.loadAndRender();
+
+      // Trigger background sync to Google Drive
+      this.syncToCloudBackground();
+
+      // Close modal
+      const modal = document.getElementById('modal-import-statement');
+      if (modal) modal.style.display = 'none';
+      this.resetStatementModal();
+
+      this.showToast(`🎉 Successfully imported ${toSave.length} transactions from bank statement!`, 'success');
+    } catch (err) {
+      console.error('Failed to commit statement import:', err);
+      this.showToast('Import failed: ' + err.message, 'error');
+      if (btnCommit) {
+        btnCommit.disabled = false;
+        btnCommit.innerHTML = `<span>📥 Import Selected Entries</span>`;
+      }
     }
   }
 

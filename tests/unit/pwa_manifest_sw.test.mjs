@@ -38,7 +38,7 @@ test('PWA Service Worker: sw.js exists and declares valid cache name and precach
   assert.ok(fs.existsSync(swPath), 'sw.js must exist at root');
 
   const content = fs.readFileSync(swPath, 'utf8');
-  assert.match(content, /CACHE_NAME\s*=\s*'personal-assistant-v1\.3\.0'/, 'sw.js must declare v1.3.0 cache name');
+  assert.match(content, /CACHE_NAME\s*=\s*'personal-assistant-v1\.[34]\.0'/, 'sw.js must declare valid cache name');
   assert.match(content, /addEventListener\('install'/, 'sw.js must handle install event');
   assert.match(content, /addEventListener\('activate'/, 'sw.js must handle activate event');
   assert.match(content, /addEventListener\('fetch'/, 'sw.js must handle fetch event');

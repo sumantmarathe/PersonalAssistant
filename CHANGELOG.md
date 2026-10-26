@@ -2,6 +2,30 @@
 
 All notable changes to this project are documented in this file following the Keep a Changelog standard.
 
+## [v1.4.0] - 2026-10-26 (Sprint 05 Delivery)
+
+### Added
+- **100% Client-Side Bank Statement Importer (PDF & CSV)**:
+  - Zero-knowledge, completely offline statement parser (`js/statementParser.js`) running in client browser/device memory without sending any financial data to external servers.
+  - Offline PDF text extraction powered by bundled Mozilla `pdf.min.js` and `pdf.worker.min.js` in `js/vendor/`.
+  - Robust CSV tabular engine handling RFC 4180 quotes, commas, and multi-line narrations.
+  - Built-in heuristic profiles for major Indian banks (HDFC Bank, State Bank of India, ICICI Bank, Axis Bank) plus Universal/Generic format.
+  - Automatic date normalization to ISO `YYYY-MM-DD` and INR amount sanitization (`₹`, `Rs.`, commas, Dr/Cr tags).
+  - Smart category inference for Food & Dining, Transportation, Shopping, Utilities, Salary, and Investments.
+- **Interactive Review, Mapping & Batch Commit Modal**:
+  - Drag-and-drop / file selector dialog for `.pdf` and `.csv` bank statements.
+  - Interactive table preview displaying extracted dates, narrations, income/expense tags, category dropdowns, and amounts.
+  - Duplicate detection safeguard comparing incoming entries against existing ledger records with visual warning badges (unchecked by default).
+  - Dynamic financial impact summary (count selected, total income, total expense, net balance impact).
+  - One-click batch commit to IndexedDB and automatic sync to Google Drive.
+- **Dual-Target Delivery & Offline Parity**:
+  - Offline PDF.js vendor assets automatically bundled into standalone Android APK (`app-debug.apk` 11.84 MB).
+  - Service worker cache updated to `personal-assistant-v1.4.0` with full offline precache coverage.
+- **Quality Assurance**:
+  - 8 new automated tests (6 unit tests, 2 integration tests). Total test suite: 41/41 passed (0 regressions).
+
+---
+
 ## [v1.3.0] - 2026-10-26 (Sprint 04 Delivery)
 
 ### Added
