@@ -1253,7 +1253,7 @@ class BudgetApp {
 
   switchTab(tabName) {
     this.activeTab = tabName;
-    document.querySelectorAll('.app-tab-btn').forEach((b) => {
+    document.querySelectorAll('.app-tab-btn, .app-nav .nav-tab[data-tab]').forEach((b) => {
       const isActive = b.dataset.tab === tabName;
       b.classList.toggle('active', isActive);
       b.setAttribute('aria-selected', isActive ? 'true' : 'false');

@@ -15,10 +15,13 @@ class MainApp {
     navTabs.forEach((tab) => {
       tab.addEventListener('click', () => {
         const targetApp = tab.dataset.app;
+        const targetTab = tab.dataset.tab;
         if (targetApp === 'budget') {
           navTabs.forEach((t) => t.classList.remove('active'));
           tab.classList.add('active');
-          this.switchApp(targetApp);
+          if (targetTab && window.budgetApp) {
+            window.budgetApp.switchTab(targetTab);
+          }
         } else {
           // Future modular apps notification
           if (window.budgetApp) {

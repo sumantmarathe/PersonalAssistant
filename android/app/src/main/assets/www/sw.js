@@ -1,5 +1,5 @@
 // Personal Assistant Progressive Web App - Service Worker
-const CACHE_NAME = 'personal-assistant-v1.4.0';
+const CACHE_NAME = 'personal-assistant-v1.5.0';
 
 const PRECACHE_ASSETS = [
   './',
@@ -56,6 +56,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Network-first for HTML navigations to always receive the latest deployment
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Cache-first with network fallback for assets
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
