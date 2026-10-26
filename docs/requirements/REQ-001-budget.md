@@ -105,10 +105,31 @@ The Budget & Expense Planner is a privacy-first, client-side personal finance to
     And the transaction entry form is fully accessible with touch inputs
   ```
 
+### `REQ-016`: Expense Analytics & Statistics Dashboard
+- **Description**: Dedicated tab providing actionable expense statistics, including Total Expenses, Net Savings, Savings Rate (%), Daily Average Spend, Peak Spending Day, Spending Time-Trend visualization, Top 5 Largest Expenses, and Category Breakdown with percentage progress bars. Includes granular date range filters (All Time, This Year, Last Year, This Month, Last Month, Last 30 Days, and Custom Range).
+- **Gherkin**:
+  ```gherkin
+  Scenario: Filtering expense stats by date range
+    Given transactions exist across multiple months
+    When the user navigates to "Analytics & Stats" and selects "This Month"
+    Then the metrics, trend chart, top 5 expenses, and category breakdown recompute specifically for the current month
+  ```
+
+### `REQ-017`: Multi-Account Management & Bank Statement Auto-Mapping
+- **Description**: User can register, edit, and delete multiple bank accounts (e.g. Axis Bank, State Bank of India, HDFC Bank) with Account Number, IFSC code, account type, and nickname, and mark a default account. Transactions and imported statements are mapped to specific accounts, with automatic regex detection of account number and IFSC code during statement import.
+- **Gherkin**:
+  ```gherkin
+  Scenario: Auto-detecting account from bank statement
+    Given an Axis Bank statement containing IFSC "UTIB0000045" and A/C number
+    When the user selects the statement file in the import modal
+    Then the target account dropdown preselects the matching Axis Bank account
+    And shows a verified auto-detection badge
+  ```
+
 ---
 
 ## 3. Definition of Ready (DoR) Gate 0 Sign-Off
-- [x] All 8 requirements uniquely identified and mapped.
+- [x] All requirements uniquely identified and mapped (REQ-001 through REQ-017).
 - [x] Gherkin scenarios defined for verification.
-- [x] Privacy non-functional constraint validated.
-- **Gate 0 Status**: **PASSED** &rarr; Ready for System Architect (`TASK-002`).
+- [x] Privacy non-functional constraint validated (100% on-device).
+- [x] Dual-target parity enforced across Web and Android APK.
