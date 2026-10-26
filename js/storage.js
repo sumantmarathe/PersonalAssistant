@@ -163,7 +163,7 @@ class StorageService {
       recordCount: transactions.length,
       data: {
         transactions: transactions,
-        currency: '$'
+        currency: '₹'
       }
     };
     return JSON.stringify(envelope, null, 2);

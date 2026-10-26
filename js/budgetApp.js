@@ -158,12 +158,16 @@ class BudgetApp {
     } else if (status === 'synced') {
       badge.textContent = '☁️ Synced';
       badge.className = 'sync-status synced';
+    } else if (status === 'drive_api_disabled') {
+      badge.textContent = '⚠️ Enable Drive API';
+      badge.className = 'sync-status error';
+      this.showToast('Please enable Google Drive API in your Google Cloud Console project.', 'error');
     } else if (status === 'quota_exceeded') {
       badge.textContent = '⚠️ Drive Full';
       badge.className = 'sync-status error';
-      this.showToast('Your Google Drive is out of storage. Budget is safely stored on this device.', 'error');
+      this.showToast('Your Google Drive storage is full. Budget is safely stored on this device.', 'error');
     } else if (status === 'error') {
-      badge.textContent = '⚠️ Offline';
+      badge.textContent = '⚠️ Sync Paused';
       badge.className = 'sync-status error';
     }
   }
@@ -419,7 +423,7 @@ class BudgetApp {
   }
 
   formatCurrency(amount) {
-    return '$' + Math.abs(amount).toLocaleString('en-US', {
+    return '₹' + Math.abs(amount).toLocaleString('en-IN', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });

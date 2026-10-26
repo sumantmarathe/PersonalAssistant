@@ -157,11 +157,8 @@ class GoogleDriveService {
           body: contentString
         });
         if (!res.ok) {
-          if (res.status === 403) {
-            this._notifySync('quota_exceeded');
-            return;
-          }
-          throw new Error('Sync update failed');
+          await this._handleApiError(res);
+          return;
         }
       } else {
         const metadata = { name: this.fileName, mimeType: 'application/json' };
@@ -188,18 +185,33 @@ class GoogleDriveService {
           body: multipartBody
         });
         if (!res.ok) {
-          if (res.status === 403) {
-            this._notifySync('quota_exceeded');
-            return;
-          }
-          throw new Error('Sync creation failed');
+          await this._handleApiError(res);
+          return;
         }
       }
 
       this._notifySync('synced');
     } catch (err) {
       console.warn('Auto-sync error:', err);
-      this._notifySync('error');
+      this._notifySync('error', err.message);
+    }
+  }
+
+  async _handleApiError(res) {
+    let errBody = null;
+    try {
+      errBody = await res.json();
+    } catch (e) {}
+
+    const reason = errBody?.error?.errors?.[0]?.reason || '';
+    const message = errBody?.error?.message || '';
+
+    if (reason === 'storageQuotaExceeded') {
+      this._notifySync('quota_exceeded', 'Your Google Drive storage is full.');
+    } else if (res.status === 403 && (reason === 'accessNotConfigured' || message.toLowerCase().includes('google drive api'))) {
+      this._notifySync('drive_api_disabled', 'Google Drive API is disabled in your Google Cloud project.');
+    } else {
+      this._notifySync('error', message || `Drive error (HTTP ${res.status})`);
     }
   }
 
@@ -238,6 +250,8 @@ class GoogleDriveService {
       if (res.status === 401) {
         this.accessToken = null;
         this._notifyAuth(false);
+      } else if (res.status === 403) {
+        await this._handleApiError(res);
       }
       return null;
     }
