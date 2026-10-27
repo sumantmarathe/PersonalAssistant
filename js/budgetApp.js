@@ -1799,19 +1799,23 @@ class BudgetApp {
       granEl.textContent = timeTrend.length > 0 && timeTrend[0].period.length === 7 ? 'Monthly' : 'Daily';
     }
 
-    const maxVal = Math.max(...timeTrend.map(t => Math.max(t.expense, t.income, 1)));
+    // Scale against maximum expense in the active period so bars reflect relative spending accurately
+    const maxVal = Math.max(...timeTrend.map(t => Number(t.expense) || 0), 1);
 
     container.innerHTML = timeTrend.map(item => {
-      const heightPercent = Math.min(100, Math.max(4, Math.round((item.expense / maxVal) * 100)));
+      const exp = Number(item.expense) || 0;
+      const heightPercent = exp > 0 ? Math.min(100, Math.max(6, Math.round((exp / maxVal) * 100))) : 0;
+      const displayLabel = item.period.length === 10 ? item.period.slice(5) : item.period;
       return `
         <div class="trend-bar-col">
           <div class="trend-tooltip">
-            <strong>${item.period}</strong><br>
-            Expense: ₹${item.expense.toLocaleString('en-IN')}<br>
-            Income: ₹${item.income.toLocaleString('en-IN')}
+            <strong>📅 ${item.period}</strong><br>
+            💸 Expense: ₹${exp.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <div class="trend-bar-fill" style="height: ${heightPercent}%;"></div>
-          <div class="trend-bar-label">${item.period.length === 10 ? item.period.slice(5) : item.period}</div>
+          <div class="trend-bar-track">
+            <div class="trend-bar-fill" style="height: ${heightPercent}%;"></div>
+          </div>
+          <div class="trend-bar-label">${displayLabel}</div>
         </div>
       `;
     }).join('');
