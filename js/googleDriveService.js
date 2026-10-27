@@ -78,6 +78,15 @@ class GoogleDriveService {
    * Consumer-grade Google Sign-In
    */
   async signIn() {
+    // If running inside Android native wrapper, use native Google Play Services Auth bridge
+    if (typeof window !== 'undefined' && window.AndroidNativeBridge && typeof window.AndroidNativeBridge.requestGoogleSignIn === 'function') {
+      return new Promise((resolve, reject) => {
+        this._nativeAuthResolve = resolve;
+        this._nativeAuthReject = reject;
+        window.AndroidNativeBridge.requestGoogleSignIn();
+      });
+    }
+
     if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) {
       throw new Error('Google Sign-In is initializing. Please verify internet connection and try again.');
     }
@@ -121,9 +130,50 @@ class GoogleDriveService {
   }
 
   /**
+   * Native Android Auth Bridge Callback: Success
+   */
+  handleNativeAuthSuccess(accessToken, email, name, picture) {
+    this.accessToken = accessToken;
+    this.userInfo = {
+      name: name || 'Google User',
+      email: email || 'user@gmail.com',
+      picture: picture || null
+    };
+    try {
+      localStorage.setItem('pa_google_user_session', JSON.stringify(this.userInfo));
+    } catch (e) {}
+
+    this._notifyAuth(true);
+
+    if (this._nativeAuthResolve) {
+      this._nativeAuthResolve(this.userInfo);
+      this._nativeAuthResolve = null;
+      this._nativeAuthReject = null;
+    }
+  }
+
+  /**
+   * Native Android Auth Bridge Callback: Error / Cancel
+   */
+  handleNativeAuthError(errorMessage) {
+    this._notifyAuth(false);
+    if (this._nativeAuthReject) {
+      this._nativeAuthReject(new Error(errorMessage || 'Google Sign-In was cancelled.'));
+      this._nativeAuthResolve = null;
+      this._nativeAuthReject = null;
+    }
+  }
+
+  /**
    * Consumer-grade Sign Out
    */
   async signOut() {
+    if (typeof window !== 'undefined' && window.AndroidNativeBridge && typeof window.AndroidNativeBridge.requestGoogleSignOut === 'function') {
+      try {
+        window.AndroidNativeBridge.requestGoogleSignOut();
+      } catch (e) {}
+    }
+
     if (this.accessToken && window.google && window.google.accounts && window.google.accounts.oauth2) {
       try {
         window.google.accounts.oauth2.revoke(this.accessToken, () => {});

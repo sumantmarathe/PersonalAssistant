@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.sumantmarathe.personalassistant",
+      "sha256_cert_fingerprints": [
+        "C0:13:7C:24:E8:6D:0E:78:31:F5:D5:16:E1:94:90:24:4A:45:29:E9:A3:03:21:32:00:06:9B:C2:F6:94:62:0D"
+      ]
+    }
+  }
+]

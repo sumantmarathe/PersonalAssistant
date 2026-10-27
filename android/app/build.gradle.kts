@@ -20,8 +20,8 @@ android {
     applicationId = "com.sumantmarathe.personalassistant"
     minSdk = 26
     targetSdk = 36
-    versionCode = 3
-    versionName = "1.3.0"
+    versionCode = 4
+    versionName = "1.3.1"
   }
 
   signingConfigs {
@@ -118,4 +118,7 @@ dependencies {
   implementation(libs.androidx.navigation3.ui)
   implementation(libs.androidx.navigation3.runtime)
   implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
+  // Google Play Services Native Auth
+  implementation("com.google.android.gms:play-services-auth:21.3.0")
 }
