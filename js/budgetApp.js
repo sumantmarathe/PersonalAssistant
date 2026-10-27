@@ -1788,10 +1788,12 @@ class BudgetApp {
   renderTrendChart(timeTrend) {
     const container = document.getElementById('stats-trend-chart');
     const granEl = document.getElementById('stats-trend-granularity');
+    const activeStatEl = document.getElementById('stats-trend-active-stat');
     if (!container) return;
 
     if (!timeTrend || timeTrend.length === 0) {
       container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 2rem; text-align: center; width: 100%;">No spending records in this period.</div>';
+      if (activeStatEl) activeStatEl.textContent = '';
       return;
     }
 
@@ -1802,23 +1804,54 @@ class BudgetApp {
     // Scale against maximum expense in the active period so bars reflect relative spending accurately
     const maxVal = Math.max(...timeTrend.map(t => Number(t.expense) || 0), 1);
 
+    // Identify peak spending period for initial badge display
+    const peakItem = [...timeTrend].sort((a, b) => (Number(b.expense) || 0) - (Number(a.expense) || 0))[0];
+    const defaultBadgeText = peakItem && peakItem.expense > 0
+      ? `Peak: ${peakItem.period.length === 10 ? peakItem.period.slice(5) : peakItem.period} • ₹${Number(peakItem.expense).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      : '';
+    if (activeStatEl) {
+      activeStatEl.textContent = defaultBadgeText;
+      activeStatEl.style.display = defaultBadgeText ? 'inline-flex' : 'none';
+    }
+
     container.innerHTML = timeTrend.map(item => {
       const exp = Number(item.expense) || 0;
-      const heightPercent = exp > 0 ? Math.min(100, Math.max(6, Math.round((exp / maxVal) * 100))) : 0;
+      // Cap at 72% height to guarantee generous headroom above bars inside the chart container
+      const heightPercent = exp > 0 ? Math.min(72, Math.max(6, Math.round((exp / maxVal) * 72))) : 0;
       const displayLabel = item.period.length === 10 ? item.period.slice(5) : item.period;
+      const formattedAmt = exp.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const isTall = heightPercent >= 55;
+      const tooltipPosClass = isTall ? 'pos-below' : 'pos-above';
+
       return `
-        <div class="trend-bar-col">
-          <div class="trend-tooltip">
-            <strong>📅 ${item.period}</strong><br>
-            💸 Expense: ₹${exp.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </div>
+        <div class="trend-bar-col" data-date="${item.period}" data-amt="₹${formattedAmt}">
           <div class="trend-bar-track">
-            <div class="trend-bar-fill" style="height: ${heightPercent}%;"></div>
+            <div class="trend-bar-fill" style="height: ${heightPercent}%;">
+              <div class="trend-tooltip ${tooltipPosClass}">
+                <strong>📅 ${item.period}</strong><br>
+                💸 ₹${formattedAmt}
+              </div>
+            </div>
           </div>
           <div class="trend-bar-label">${displayLabel}</div>
         </div>
       `;
     }).join('');
+
+    // Attach hover listeners for instant header stat badge updates
+    if (activeStatEl) {
+      container.querySelectorAll('.trend-bar-col').forEach(col => {
+        const updateHeader = () => {
+          activeStatEl.innerHTML = `📅 ${col.dataset.date} • 💸 ${col.dataset.amt}`;
+        };
+        const resetHeader = () => {
+          activeStatEl.textContent = defaultBadgeText;
+        };
+        col.addEventListener('mouseenter', updateHeader);
+        col.addEventListener('mouseleave', resetHeader);
+        col.addEventListener('touchstart', updateHeader, { passive: true });
+      });
+    }
   }
 
   renderTopExpenses(topExpenses) {
