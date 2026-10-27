@@ -12,6 +12,6 @@
 Write and execute automated unit tests covering mathematical calculations (balance, income sums, expense sums), input validation, negative values, date formatting, and backup data schema validation.
 
 ## 2. Deliverables
-- [ ] Unit test suite in `tests/unit/`.
-- [ ] Automated test runner configuration.
-- [ ] 100% test pass rate execution log (`tests/reports/unit-test-report.md`).
+- [x] Unit test suite in `tests/unit/`.
+- [x] Automated test runner configuration.
+- [x] 100% test pass rate execution log (`tests/reports/unit-test-report.md`).

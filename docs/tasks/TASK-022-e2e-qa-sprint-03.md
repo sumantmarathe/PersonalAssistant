@@ -22,4 +22,3 @@ Execute dual-target empirical verification:
 ## 2. Deliverables
 - [x] Browser E2E validation report and recorded media artifact (`web_app_dual_target_qa_1793022167122.webp`).
 - [x] Android device/emulator E2E validation report and screenshot evidence (`android_app_balance_updated.png`).
-

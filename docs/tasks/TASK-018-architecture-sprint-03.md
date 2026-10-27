@@ -18,4 +18,3 @@ Architect the standalone Android application structure in `android/`, define the
 - [x] Emulator environment verified (`medium_phone` AVD ready).
 - [x] Google OAuth Client ID verified for Android WebView origin.
 - [x] Architectural Specification published in `docs/design/SPEC-003-android-app.md`.
-

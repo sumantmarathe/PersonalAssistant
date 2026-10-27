@@ -16,4 +16,3 @@ Build the Android application project in `android/`, configure Gradle build file
 - [x] Android application project in `android/` (`com.personalassistant.app`).
 - [x] `scripts/build-android.mjs` (synchronizes root web files into Android `assets/` and triggers APK build).
 - [x] Compiled debug APK verified (`android/app/build/outputs/apk/debug/app-debug.apk`).
-

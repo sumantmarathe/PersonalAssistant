@@ -18,7 +18,7 @@ Transform customer intent into explicit, unambiguous functional and non-function
 - **CN-04**: Privacy-first / Zero-knowledge: data strictly local, never transmitted or stored on app/server, backup & restore mechanism for transfer.
 
 ## 3. Deliverables
-- [ ] Requirements Document created in `docs/requirements/REQ-001-budget.md`.
-- [ ] Gherkin acceptance criteria defined for every functional capability.
-- [ ] Initial rows populated in `docs/v-cycle/RTM.md`.
-- [ ] Tech Lead gate verification sign-off.
+- [x] Requirements Document created in `docs/requirements/REQ-001-budget.md`.
+- [x] Gherkin acceptance criteria defined for every functional capability.
+- [x] Initial rows populated in `docs/v-cycle/RTM.md`.
+- [x] Tech Lead gate verification sign-off.

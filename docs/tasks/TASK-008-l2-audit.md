@@ -12,5 +12,5 @@
 Meta-audit the L1 Reviewer's findings, verify methodology compliance, inspect security/privacy guarantees (zero outbound telemetry), and issue the formal Release Clearance Certificate.
 
 ## 2. Deliverables
-- [ ] L2 Principal Audit Certificate (`docs/audits/L2-AUDIT-sprint-01.md`).
-- [ ] Final green light for customer release presentation.
+- [x] L2 Principal Audit Certificate (`docs/audits/L2-AUDIT-sprint-01.md`).
+- [x] Final green light for customer release presentation.

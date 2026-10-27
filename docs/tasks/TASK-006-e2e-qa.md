@@ -12,5 +12,5 @@
 Drive real browser sessions via browser subagent across both PC (Desktop 1920x1080) and Mobile (390x844) viewports. Validate every single Acceptance Criterion defined in `REQ-001-budget.md`.
 
 ## 2. Deliverables
-- [ ] Browser execution session recording.
-- [ ] QA Sign-off report with screenshot evidence (`tests/reports/qa-e2e-report.md`).
+- [x] Browser execution session recording.
+- [x] QA Sign-off report with screenshot evidence (`tests/reports/qa-e2e-report.md`).

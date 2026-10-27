@@ -15,4 +15,3 @@ Validate that local IndexedDB storage and Google Drive cloud sync operate with i
 ## 2. Deliverables
 - [x] Integration tests in `tests/integration/dual_target_persistence.test.mjs`.
 - [x] 100% pass rate execution across all integration tests (6/6 passed).
-

@@ -1,78 +1,45 @@
 # Requirements Traceability Matrix (RTM)
 
-**Sprint**: Sprint 03 (Dual-Target Release v1.2.0)  
-**Target Delivery**: Android Application & Dual-Target Release Pipeline  
-**Branch**: `feat/sprint-03-android-app`  
-**Last Updated**: 2026-10-26 (Sprint 03 Kickoff)  
+> **Governance Framework**: High-Assurance V-Cycle Model  
+> **Target Release**: `v1.7.0` (Web Deployed + Android Native Release)  
+> **Last Updated**: 2026-10-27 | **Status**: 🟢 100% Verified & Certified  
 
 ---
 
-## Sprint 01 Baseline (Certified in Production `main`)
-| Req ID | Customer Need | Description | Design Spec | Implementation | Unit Test | Integration / E2E Test | L1 Sign-off | L2 Sign-off |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **REQ-001** | CN-01 | Multi-App Shell & Navigation | `SPEC-001#S2` | `index.html`, `js/app.js` | `budget_logic.test.mjs` | Browser E2E Inspection | 🟢 Approved | 🟢 Certified |
-| **REQ-002** | CN-02 | Add Incomes & Expenses | `SPEC-001#S3` | `js/budgetApp.js#L210` | `budget_logic.test.mjs` (TC-1,2) | Browser E2E Inspection | 🟢 Approved | 🟢 Certified |
-| **REQ-003** | CN-02 | Delete Transactions | `SPEC-001#S3` | `js/budgetApp.js#L239` | `storage_persistence.test.mjs` | Browser E2E Inspection | 🟢 Approved | 🟢 Certified |
-| **REQ-004** | CN-02 | Balance & Summary Metrics | `SPEC-001#S4` | `js/budgetApp.js#L125` | `budget_logic.test.mjs` (TC-1..4) | Browser E2E Inspection | 🟢 Approved | 🟢 Certified |
-| **REQ-005** | CN-02 | Ledger Filter & Search | `SPEC-001#S5` | `js/budgetApp.js#L159` | `budget_logic.test.mjs` (TC-5..8) | Browser E2E Inspection | 🟢 Approved | 🟢 Certified |
-| **REQ-006** | CN-04 | 100% Local IndexedDB Persistence | `SPEC-001#S6` | `js/storage.js#L21` | `storage_persistence.test.mjs` | Browser E2E Inspection | 🟢 Approved | 🟢 Certified |
-| **REQ-007** | CN-03,04 | Cross-Device JSON Backup/Restore | `SPEC-001#S7` | `js/storage.js#L152` | `budget_logic.test.mjs` (TC-9..11)| `storage_persistence.test.mjs` | 🟢 Approved | 🟢 Certified |
-| **REQ-008** | CN-03 | Mobile & Desktop Responsive Layout | `SPEC-001#S8` | `css/style.css#L427` | Viewport Media Queries | Browser E2E Mobile Inspection | 🟢 Approved | 🟢 Certified |
+## Complete Verification & Traceability Coverage
 
----
-
-## Sprint 02 Scope (Google Drive Cloud Sync)
-| Req ID | Customer Need | Description | Design Spec | Implementation | Unit Test | Integration / E2E Test | L1 Sign-off | L2 Sign-off |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **REQ-009** | CN-05 | Google Identity OAuth 2.0 Sign-In | `SPEC-002#S2` | `js/googleDriveService.js#L78` | `google_drive_sync.test.mjs` (TC-5) | `qa-e2e-report-sprint-02.md` | 🟢 Approved | 🟢 Certified |
-| **REQ-010** | CN-05 | Custom OAuth Client ID Config | `SPEC-002#S3` | `js/googleDriveService.js#L48` | `google_drive_sync.test.mjs` (TC-1,2) | `qa-e2e-report-sprint-02.md` | 🟢 Approved | 🟢 Certified |
-| **REQ-011** | CN-05 | Sync to Drive (Cloud Backup) | `SPEC-002#S4` | `js/googleDriveService.js#L143` | `drive_sync_persistence.test.mjs` (TC-1) | `qa-e2e-report-sprint-02.md` | 🟢 Approved | 🟢 Certified |
-| **REQ-012** | CN-05 | Restore from Drive (Cloud Import) | `SPEC-002#S4` | `js/googleDriveService.js#L206` | `drive_sync_persistence.test.mjs` (TC-1) | `qa-e2e-report-sprint-02.md` | 🟢 Approved | 🟢 Certified |
-| **REQ-013** | CN-05 | Disconnect & Session Termination | `SPEC-002#S6` | `js/googleDriveService.js#L125` | `google_drive_sync.test.mjs` (TC-6) | `qa-e2e-report-sprint-02.md` | 🟢 Approved | 🟢 Certified |
-
----
-
-## Sprint 03 Scope (Android Application & Dual-Target Release v1.2.0)
-| Req ID | Customer Need | Description | Design Spec | Implementation | Unit Test | Integration / E2E Test | L1 Sign-off | L2 Sign-off |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **REQ-014** | CN-06 | Standalone Android Native App Shell | `SPEC-003#S2` | `android/`, `MainActivity` | `android_packaging.test.mjs` | Android Emulator QA Inspection | 🟢 Approved | 🟢 Certified |
-| **REQ-015** | CN-06 | 100% Storage & Local Persistence Parity | `SPEC-003#S3` | `WebView` DOM Storage | `dual_target_persistence.test.mjs` | Android Emulator QA Inspection | 🟢 Approved | 🟢 Certified |
-| **REQ-016** | CN-06 | Android Cloud Sync & OAuth Compatibility | `SPEC-003#S4` | `MainActivity`, `js/googleDriveService.js` | `google_drive_sync.test.mjs` | Android Emulator QA Inspection | 🟢 Approved | 🟢 Certified |
-| **REQ-017** | CN-06 | Dual-Target Automated Verification Suite | `SPEC-003#S5` | `scripts/build-android.mjs` | Node test runner + Android CLI | Browser QA + Android Screen | 🟢 Approved | 🟢 Certified |
-| **REQ-018** | CN-06 | Dual-Target Production Build & Release Artifacts | `SPEC-003#S6` | GitHub Pages + Gradle APK build | Checksum & Package audit | Live Web + Compiled APK | 🟢 Approved | 🟢 Certified |
-
----
-
----
-
-## Sprint 04 Scope (PWA Mobile Installation & Offline Mode v1.3.0)
-| Req ID | Customer Need | Description | Design Spec | Implementation | Unit Test | Integration / E2E Test | L1 Sign-off | L2 Sign-off |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **REQ-019** | CN-06 | W3C Web App Manifest Specification | `SPEC-004#S2.1` | `manifest.json`, `icons/` | `pwa_manifest_sw.test.mjs` | Browser QA Discovery | 🟢 Approved | 🟢 Certified |
-| **REQ-020** | CN-06 | Service Worker & Offline Caching Engine | `SPEC-004#S2.2` | `sw.js` | `pwa_manifest_sw.test.mjs` | `pwa_offline.test.mjs` | 🟢 Approved | 🟢 Certified |
-| **REQ-021** | CN-06 | In-App Install Prompt User Experience | `SPEC-004#S2.3` | `index.html`, `js/app.js` | `pwa_manifest_sw.test.mjs` | Browser Subagent QA | 🟢 Approved | 🟢 Certified |
-| **REQ-022** | CN-06 | Dual-Target Release & Asset Synchronization Parity | `SPEC-004#S3` | `scripts/build-android.mjs` | `pwa_manifest_sw.test.mjs` | `build-android.mjs` Execution | 🟢 Approved | 🟢 Certified |
-
----
-
-## Sprint 05 Scope (Bank Statement Importer PDF & CSV v1.4.0)
-| Req ID | Customer Need | Description | Design Spec | Implementation | Unit Test | Integration / E2E Test | L1 Sign-off | L2 Sign-off |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **REQ-023** | CN-07 | Zero-Knowledge Client-Side File Ingestion | `SPEC-005#S2.1` | `FileReader`, `statementParser.js` | `statement_parser.test.mjs` | Browser QA File Ingestion | 🟢 Approved | 🟢 Certified |
-| **REQ-024** | CN-07 | PDF Statement Text Extraction Engine | `SPEC-005#S2.3` | `js/vendor/pdf.min.js`, `parsePDF` | `statement_parser.test.mjs` | `statement_import_flow.test.mjs` | 🟢 Approved | 🟢 Certified |
-| **REQ-025** | CN-07 | CSV Bank Statement Tabular Parsing Engine | `SPEC-005#S2.2` | `parseCSV` in `statementParser.js` | `statement_parser.test.mjs` | `statement_import_flow.test.mjs` | 🟢 Approved | 🟢 Certified |
-| **REQ-026** | CN-07 | Bank Statement Preset Heuristics & Normalization | `SPEC-005#S2.4` | Presets (HDFC, SBI, ICICI, Axis) | `statement_parser.test.mjs` | `statement_import_flow.test.mjs` | 🟢 Approved | 🟢 Certified |
-| **REQ-027** | CN-07 | Interactive Review, Mapping & Batch Commit Modal | `SPEC-005#S2.6` | `index.html`, `budgetApp.js` | `statement_parser.test.mjs` | Browser Subagent Modal QA | 🟢 Approved | 🟢 Certified |
-| **REQ-028** | CN-07 | Duplicate Transaction Detection Safeguard | `SPEC-005#S2.6` | `flagDuplicates` in `statementParser.js` | `statement_parser.test.mjs` | `statement_import_flow.test.mjs` | 🟢 Approved | 🟢 Certified |
-
----
-
-## Task & Process Audit Traceability
-- **Sprint 01 Tasks**: `docs/tasks/TASK-001` through `TASK-008` (All 🟢 Certified).
-- **Sprint 02 Tasks**: `docs/tasks/TASK-009` through `TASK-016` (All 🟢 Certified).
-- **Sprint 03 Tasks**: `docs/tasks/TASK-017` through `TASK-024` (All 🟢 Certified).
-- **Sprint 04 Tasks**: `docs/tasks/TASK-025` through `TASK-032` (All 🟢 Certified).
-- **Sprint 05 Tasks**: `docs/tasks/TASK-033` through `TASK-040` (All 🟢 Certified).
-- **Process Compliance Audits**: `docs/audits/PROCESS-AUDIT-01.md`, `PROCESS-AUDIT-02.md`, and `PROCESS-AUDIT-03.md` (All NCRs verified & closed).
-
-
+| Req ID | Need | Description | Design Spec | Implementation | Test Suite | L1 Review | L2 Audit |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **REQ-001** | CN-01 | Multi-App Shell & Navigation | `SPEC-001#S2` | `index.html`, `js/app.js` | `budget_logic.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-002** | CN-02 | Add Incomes & Expenses | `SPEC-001#S3` | `js/budgetApp.js#L210` | `budget_logic.test.mjs` (TC-1,2) | 🟢 Approved | 🟢 Certified |
+| **REQ-003** | CN-02 | Delete Transactions | `SPEC-001#S3` | `js/budgetApp.js#L239` | `storage_persistence.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-004** | CN-02 | Balance & Summary Metrics | `SPEC-001#S4` | `js/budgetApp.js#L125` | `budget_logic.test.mjs` (TC-1..4) | 🟢 Approved | 🟢 Certified |
+| **REQ-005** | CN-02 | Ledger Filter & Search | `SPEC-001#S5` | `js/budgetApp.js#L159` | `budget_logic.test.mjs` (TC-5..8) | 🟢 Approved | 🟢 Certified |
+| **REQ-006** | CN-04 | 100% Local IndexedDB Persistence | `SPEC-001#S6` | `js/storage.js#L21` | `storage_persistence.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-007** | CN-03,04 | Cross-Device JSON Backup/Restore | `SPEC-001#S7` | `js/storage.js#L152` | `budget_logic.test.mjs` (TC-9..11) | 🟢 Approved | 🟢 Certified |
+| **REQ-008** | CN-03 | Mobile & Desktop Responsive Layout | `SPEC-001#S8` | `css/style.css#L427` | Browser QA Mobile Inspection | 🟢 Approved | 🟢 Certified |
+| **REQ-009** | CN-05 | Google Identity OAuth 2.0 Sign-In | `SPEC-002#S2` | `js/googleDriveService.js#L78` | `google_drive_sync.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-010** | CN-05 | Custom OAuth Client ID Config | `SPEC-002#S3` | `js/googleDriveService.js#L48` | `google_drive_sync.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-011** | CN-05 | Sync to Drive (Cloud Backup) | `SPEC-002#S4` | `js/googleDriveService.js#L143`| `drive_sync_persistence.test.mjs`| 🟢 Approved | 🟢 Certified |
+| **REQ-012** | CN-05 | Restore from Drive (Cloud Import) | `SPEC-002#S4` | `js/googleDriveService.js#L206`| `drive_sync_persistence.test.mjs`| 🟢 Approved | 🟢 Certified |
+| **REQ-013** | CN-05 | Disconnect & Session Termination | `SPEC-002#S6` | `js/googleDriveService.js#L125`| `google_drive_sync.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-014** | CN-06 | Standalone Android Native App Shell | `SPEC-003#S2` | `android/`, `MainActivity` | `android_packaging.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-015** | CN-06 | 100% Storage & Local Persistence Parity | `SPEC-003#S3` | `WebView` DOM Storage | `dual_target_persistence.test.mjs`| 🟢 Approved | 🟢 Certified |
+| **REQ-016** | CN-06 | Android Cloud Sync & OAuth Compatibility | `SPEC-003#S4` | `MainActivity`, `googleDrive` | `google_drive_sync.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-017** | CN-06 | Dual-Target Automated Verification Suite | `SPEC-003#S5` | `scripts/build-android.mjs` | Node test runner + Android CLI | 🟢 Approved | 🟢 Certified |
+| **REQ-018** | CN-06 | Dual-Target Production Build Artifacts | `SPEC-003#S6` | GitHub Pages + Gradle APK | Checksum & Package audit | 🟢 Approved | 🟢 Certified |
+| **REQ-019** | CN-06 | W3C Web App Manifest Specification | `SPEC-004#S2.1` | `manifest.json`, `icons/` | `pwa_manifest_sw.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-020** | CN-06 | Service Worker & Offline Caching Engine | `SPEC-004#S2.2` | `sw.js` | `pwa_manifest_sw.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-021** | CN-06 | In-App Install Prompt User Experience | `SPEC-004#S2.3` | `index.html`, `js/app.js` | Browser QA Inspection | 🟢 Approved | 🟢 Certified |
+| **REQ-022** | CN-06 | Dual-Target Asset Synchronization Parity | `SPEC-004#S3` | `scripts/build-android.mjs` | `pwa_manifest_sw.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-023** | CN-07 | Zero-Knowledge PDF/CSV Parser | `SPEC-005#S2` | `js/statementParser.js` | `statement_parser.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-024** | CN-07 | Bank Presets & Normalization | `SPEC-005#S3` | `js/statementParser.js` | `statement_parser.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-025** | CN-07 | Smart Categorization Inference | `SPEC-005#S4` | `js/statementParser.js` | `statement_parser.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-026** | CN-07 | Interactive Statement Review Modal | `SPEC-005#S5` | `index.html`, `js/budgetApp.js` | `statement_import_flow.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-027** | CN-07 | Duplicate Transaction Detection | `SPEC-005#S6` | `js/statementParser.js` | `statement_parser.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-028** | CN-07 | Batch Ingestion Storage Transaction | `SPEC-005#S7` | `js/storage.js` | `statement_import_flow.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-029** | CN-08 | Sortable Statement Review Table | `SPEC-006#S1` | `js/budgetApp.js` | Browser QA DevTools Inspection | 🟢 Approved | 🟢 Certified |
+| **REQ-030** | CN-09 | Expense Statistics & Analytics Dashboard | `SPEC-006#S2` | `js/budgetApp.js`, `index.html`| `analytics_stats.test.mjs` | 🟢 Approved | 🟢 Certified |
+| **REQ-031** | CN-10 | Multi-Account Management & Filtering | `SPEC-006#S3` | `js/budgetApp.js`, `js/storage.js`| `analytics_accounts_filter.test.mjs`| 🟢 Approved | 🟢 Certified |
+| **REQ-032** | CN-11 | Bulk Deletion & Database Purge Modal | `SPEC-006#S4` | `index.html`, `js/budgetApp.js` | Browser QA Inspection | 🟢 Approved | 🟢 Certified |
+| **REQ-033** | CN-12 | Responsive Mobile Segmented Controls & SW v1.7.0 | `SPEC-006#S5` | `css/style.css`, `sw.js` | `pwa_manifest_sw.test.mjs` | 🟢 Approved | 🟢 Certified |
