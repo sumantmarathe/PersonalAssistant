@@ -30,7 +30,7 @@ describe('Unit Test Suite: Android Packaging & Manifest Configuration (REQ-014, 
 
     const gradleContent = fs.readFileSync(gradlePath, 'utf8');
     assert.match(gradleContent, /namespace = "com\.personalassistant\.app"/, 'Namespace must be com.personalassistant.app');
-    assert.match(gradleContent, /applicationId = "com\.personalassistant\.app"/, 'Application ID must be com.personalassistant.app');
+    assert.match(gradleContent, /applicationId = "(com\.personalassistant\.app|com\.sumantmarathe\.personalassistant)"/, 'Application ID must be valid');
     assert.match(gradleContent, /minSdk = 26/, 'Min SDK must be 26');
     assert.match(gradleContent, /compileSdk = 36/, 'Compile SDK must be 36');
   });
@@ -43,6 +43,13 @@ describe('Unit Test Suite: Android Packaging & Manifest Configuration (REQ-014, 
     assert.strictEqual(fs.existsSync(path.resolve(assetsDir, 'js', 'budgetApp.js')), true, 'js/budgetApp.js must be bundled');
     assert.strictEqual(fs.existsSync(path.resolve(assetsDir, 'js', 'storage.js')), true, 'js/storage.js must be bundled');
     assert.strictEqual(fs.existsSync(path.resolve(assetsDir, 'js', 'googleDriveService.js')), true, 'js/googleDriveService.js must be bundled');
+  });
+
+  it('Verifies the compiled release App Bundle (.aab) artifact exists and is non-empty', () => {
+    const aabPath = path.resolve(androidDir, 'app', 'build', 'outputs', 'bundle', 'release', 'app-release.aab');
+    assert.strictEqual(fs.existsSync(aabPath), true, 'app-release.aab must exist');
+    const stats = fs.statSync(aabPath);
+    assert.ok(stats.size > 1024 * 1024, 'App Bundle artifact must be greater than 1 MB');
   });
 
   it('Verifies the compiled debug APK artifact exists and is non-empty', () => {

@@ -1,9 +1,11 @@
 # Dependencies
 node_modules/
 
-# OS metadata
+# OS metadata & IDEs
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
 
 # Logs
 *.log
@@ -17,4 +19,9 @@ android/.gradle/
 android/app/build/
 local.properties
 android/local.properties
+key.properties
+android/key.properties
+*.keystore
+*.jks
 artifacts_screenshots/
+

@@ -1,9 +1,10 @@
 // Personal Assistant Progressive Web App - Service Worker
-const CACHE_NAME = 'personal-assistant-v1.9.0';
+const CACHE_NAME = 'personal-assistant-v2.0.0';
 
 const PRECACHE_ASSETS = [
   './',
   './index.html',
+  './privacy.html',
   './css/style.css',
   './js/app.js',
   './js/budgetApp.js',

@@ -1,24 +1,61 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlin.serialization)
 }
 
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+  FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
+}
+
 android {
   namespace = "com.personalassistant.app"
   compileSdk = 36
   defaultConfig {
-    applicationId = "com.personalassistant.app"
+    applicationId = "com.sumantmarathe.personalassistant"
     minSdk = 26
     targetSdk = 36
-    versionCode = 2
-    versionName = "1.2.0"
+    versionCode = 3
+    versionName = "1.3.0"
+  }
+
+  signingConfigs {
+    create("release") {
+      if (keystorePropertiesFile.exists()) {
+        val storePath = keystoreProperties.getProperty("storeFile") ?: "release.keystore"
+        val resolvedStore = file(storePath).takeIf { it.exists() } ?: rootProject.file(storePath)
+        storeFile = resolvedStore
+        storePassword = keystoreProperties.getProperty("storePassword")
+        keyAlias = keystoreProperties.getProperty("keyAlias")
+        keyPassword = keystoreProperties.getProperty("keyPassword")
+      }
+    }
   }
 
   buildTypes {
     release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+      if (keystorePropertiesFile.exists()) {
+        signingConfig = signingConfigs.getByName("release")
+      }
+    }
+  }
+
+  bundle {
+    language {
+      enableSplit = false
+    }
+    density {
+      enableSplit = true
+    }
+    abi {
+      enableSplit = true
     }
   }
   compileOptions {
